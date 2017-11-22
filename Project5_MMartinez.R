@@ -46,14 +46,18 @@ coef(regfit.full,10)
 ##KNN Section##
 
 #KNN Test Data#
+df_nona <- na.omit(df_subset)
+attach(df_nona)
+
 set.seed(1)
-train = sample(nrow(df_subset), 2937)
+train = sample(nrow(df_nona), 33346)
 test = df[-train,]
 
-test_knn = sample(nrow(test), 2937)
+test_knn = sample(nrow(test), 33346)
 
 #KNN Analysis Build#
-predictorsKNN=cbind(jitter, nhr)
-knn.pred=class::knn(predictorsKNN[train, ],predictorsKNN[test_knn,],motor_updrs[train],k=1)
-table(knn.pred,motor_updrs[test_knn])
-mean(knn.pred==motor_updrs[test_knn])
+predictorsKNN=cbind(age_name_from, death_abs, death_abs_ui_upto, death_pct_ui_from, death_pct_ui_upto, death_rate, death_rate_ui_from, yll_abs, yll_abs_ui_from, yll_abs_ui_upto, yll_rate, yll_rate_ui_from, yld_abs, yld_abs_ui_from, yld_pct, yld_pct_ui_from, yld_pct_ui_upto, yld_rate, yld_rate_ui_upto, daly_abs, daly_abs_ui_from, daly_abs_ui_upto, daly_pct, daly_rate, daly_rate_ui_from)
+
+knn.pred=class::knn(predictorsKNN[train, ],predictorsKNN[test_knn,],cause_name[train],k=1)
+table(knn.pred,cause_name[test_knn])
+mean(knn.pred==cause_name[test_knn])
