@@ -42,3 +42,18 @@ summary(regfit.full)
 plot(regfit.full,scale="Cp")
 plot(regfit.full,scale="adjr2")
 coef(regfit.full,10)
+
+##KNN Section##
+
+#KNN Test Data#
+set.seed(1)
+train = sample(nrow(df_subset), 2937)
+test = df[-train,]
+
+test_knn = sample(nrow(test), 2937)
+
+#KNN Analysis Build#
+predictorsKNN=cbind(jitter, nhr)
+knn.pred=class::knn(predictorsKNN[train, ],predictorsKNN[test_knn,],motor_updrs[train],k=1)
+table(knn.pred,motor_updrs[test_knn])
+mean(knn.pred==motor_updrs[test_knn])
