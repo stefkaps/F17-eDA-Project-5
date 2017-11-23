@@ -51,7 +51,7 @@ attach(df_nona)
 
 set.seed(1)
 train = sample(nrow(df_nona), 33346)
-test = df[-train,]
+test = df_nona[-train,]
 
 test_knn = sample(nrow(test), 33346)
 
@@ -61,3 +61,16 @@ predictorsKNN=cbind(age_name_from, death_abs, death_abs_ui_upto, death_pct_ui_fr
 knn.pred=class::knn(predictorsKNN[train, ],predictorsKNN[test_knn,],cause_name[train],k=1)
 table(knn.pred,cause_name[test_knn])
 mean(knn.pred==cause_name[test_knn])
+
+##Linear Regression##
+dfb=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
+dfb=dplyr::sample_n(dfb, 10000)
+
+attach(dfb)
+
+fitDeathAbs = lm(death_abs~yll_abs_ui_from + yll_abs + yll_abs_ui_upto,data=dfb)
+fitDeathAbs
+summary(fitDeathAbs)
+
+
+
