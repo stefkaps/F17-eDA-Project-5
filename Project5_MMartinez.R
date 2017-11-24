@@ -43,6 +43,63 @@ plot(regfit.full,scale="Cp")
 plot(regfit.full,scale="adjr2")
 coef(regfit.full,10)
 
+#deathabs section#
+dfb=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
+dfb=dplyr::sample_n(dfb, 10000)
+
+attach(dfb)
+
+regfit.full=regsubsets(death_abs~.,data=dfb, nvmax=37)
+reg.summary=summary(regfit.full)
+names(reg.summary)
+plot(reg.summary$cp,xlab="Number of Variables",ylab="Cp")
+which.min(reg.summary$cp)
+
+plot(reg.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
+which.max(reg.summary$adjr2)
+
+summary(regfit.full)
+
+plot(regfit.full,scale="Cp")
+plot(regfit.full,scale="adjr2")
+coef(regfit.full,10)
+
+##Forwards and Backwards Selection Section##
+dfb=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
+dfb=dplyr::sample_n(dfb, 10000)
+
+attach(dfb)
+
+#Forward#
+regfit.fwd=regsubsets(death_abs~.,data=dfb,nvmax=37,method="forward")
+summary(regfit.fwd)
+
+plot(regfit.fwd,scale="Cp")
+plot(regfit.fwd,scale="adjr2")
+
+regfwd.summary=summary(regfit.fwd)
+
+which.min(regfwd.summary$cp)
+which.max(regfwd.summary$adjr2)
+
+plot(regfwd.summary$cp,xlab="Number of Variables",ylab="Cp")
+plot(regfwd.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
+
+#Backward#
+regfit.bwd=regsubsets(death_abs~.,data=dfb,nvmax=37,method="backward")
+summary(regfit.bwd)
+
+plot(regfit.bwd,scale="Cp")
+plot(regfit.bwd,scale="adjr2")
+
+regbwd.summary=summary(regfit.bwd)
+
+which.min(regbwd.summary$cp)
+which.max(regbwd.summary$adjr2)
+
+plot(regbwd.summary$cp,xlab="Number of Variables",ylab="Cp")
+plot(regbwd.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
+
 ##KNN Section##
 
 #KNN Test Data#
