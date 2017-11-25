@@ -119,7 +119,7 @@ knn.pred=class::knn(predictorsKNN[train, ],predictorsKNN[test_knn,],cause_name[t
 table(knn.pred,cause_name[test_knn])
 mean(knn.pred==cause_name[test_knn])
 
-##Linear Regression##
+##Linear Regression Section##
 dfb=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
 dfb=dplyr::sample_n(dfb, 10000)
 
@@ -128,6 +128,29 @@ attach(dfb)
 fitDeathAbs = lm(death_abs~yll_abs_ui_from + yll_abs + yll_abs_ui_upto,data=dfb)
 fitDeathAbs
 summary(fitDeathAbs)
+
+##Lasso Section##
+dfb=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
+dfb=dplyr::sample_n(dfb, 10000)
+
+dfb_nona <- na.omit(dfb)
+
+attach(dfb_nona)
+
+x=model.matrix(death_abs~.-1,data=dfb_nona) 
+
+y=dfb_nona$death_abs
+
+fit.lasso=glmnet(x,y,family="gaussian")
+
+plot(fit.lasso,xvar="lambda",label=TRUE) 
+
+cv.lasso=cv.glmnet(x,y,family="gaussian")
+
+plot(cv.lasso)
+
+coef(cv.lasso)
+
 
 
 
