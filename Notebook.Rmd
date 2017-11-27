@@ -1,0 +1,62 @@
+---
+title: "Working Title"
+author: 'Group 2: Kelly Jennings, Stefanos Kapetanakis, Marcus Martinez, Rachel Tarrant, Changyong Yi'
+resource_files:
+- .Renviron
+output:
+  html_notebook:
+    code_folding: hide
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(modelr)
+require(dplyr)
+require(MASS)
+require(ISLR)
+require(ggplot2)
+library(leaps)
+library(glmnet)
+require(tree)
+require(randomForest)
+require(gbm)
+require(data.world)
+require(shiny)
+require(e1071)
+knitr::opts_chunk$set(echo = TRUE)
+```
+  
+## **R Session Info**  
+
+```{r}
+sessionInfo()
+```
+
+## **Github Link** 
+
+
+## **Data.World Link**
+
+
+## **Connecting to data.world** 
+```{r}
+project <- "https://data.world/kellyjennings/disease"
+data.world::set_config(cfg_env("DW_API"))
+df <- data.world::query(
+  data.world::qry_sql("SELECT * FROM GlobalBurdenofDisease_Europe"),
+  dataset = project
+)
+```
+
+## Setup
+We created several dataframes for our analyses. 
+```{r}
+
+```
+## **Introduction** 
+
+
