@@ -125,7 +125,13 @@ dfb=dplyr::sample_n(dfb, 10000)
 
 attach(dfb)
 
+#Original Predictors#
 fitDeathAbs = lm(death_abs~yll_abs_ui_from + yll_abs + yll_abs_ui_upto,data=dfb)
+fitDeathAbs
+summary(fitDeathAbs)
+
+#Updated Predictors#
+fitDeathAbs = lm(death_abs~yll_abs_ui_from + yll_abs,data=dfb)
 fitDeathAbs
 summary(fitDeathAbs)
 
