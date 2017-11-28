@@ -22,6 +22,36 @@ df <- data.world::query(
 
 
 dfb=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
-dfb=dplyr::sample_n(dfb, 10000)
-boost.df=gbm(death_abs~.,data=dfb,distribution="gaussian",n.trees=1000,shrinkage=0.01,interaction.depth=4)
+dfb=dplyr::sample_n(dfb, 3000)
+boost.df=gbm(death_abs~.,data=dfb,distribution="gaussian",n.trees=500,shrinkage=0.01,interaction.depth=4)
 summary(boost.df)
+
+# k means clustering
+dfe <- data.world::query(
+  data.world::qry_sql("SELECT * FROM GlobalBurdenofDisease_Europe"),
+  dataset = project
+)
+
+dfe_heart = dfe %>% dplyr::filter(region_name %in% c("Eastern Europe", "Western Europe") & cause_name %in% c("Ischemic heart disease", "Ischemic stroke") & age_name_unit == "years")
+
+x_km = dfe_heart%>%dplyr::select(yld_rate, yll_rate)
+km.out=kmeans(x_km,2)
+km.out
+par(mfrow = c(1, 2))
+plot(x_km,col=km.out$cluster,cex=2,main = "K means clustering", pch=1,lwd=2)
+plot(x_km,col=as.factor(dfe_heart$region_name),cex=2,main = "Actual",pch=1,lwd=2)
+# ggplot alternative:
+km.out$cluster
+dfcluster <- data.frame(x, km.out$cluster)
+names(dfcluster)
+dfcluster2 <- dplyr::bind_cols(dfcluster, data.frame(df$subject))
+
+kmeansubject <- dfcluster2 %>% ggplot(aes(x=age, y=total_updrs, colour = as.factor(km.out.cluster))) + geom_point()
+actualsubject <- dfcluster2 %>% ggplot(aes(x=age, y=total_updrs, colour = as.factor(df.subject))) + geom_point()
+
+df1 <- data.frame(km.out$centers, km.out$size)
+names(df1)
+dfcluster2 %>% ggplot() + geom_point(mapping = aes(x=age, y=total_updrs, colour = as.factor(km.out.cluster))) + geom_point(data=df1, mapping=aes(age, total_updrs, size=km.out.size))
+
+df2 %>% ggplot(aes(x=age, y = total_updrs, colour = sex2)) + geom_point()
+
