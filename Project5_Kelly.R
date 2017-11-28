@@ -42,16 +42,16 @@ plot(x_km,col=km.out$cluster,cex=2,main = "K means clustering", pch=1,lwd=2)
 plot(x_km,col=as.factor(dfe_heart$region_name),cex=2,main = "Actual",pch=1,lwd=2)
 # ggplot alternative:
 km.out$cluster
-dfcluster <- data.frame(x, km.out$cluster)
+dfcluster <- data.frame(x_km, km.out$cluster)
 names(dfcluster)
-dfcluster2 <- dplyr::bind_cols(dfcluster, data.frame(df$subject))
+dfcluster2 <- dplyr::bind_cols(dfcluster, data.frame(dfe_heart$region_name))
 
-kmeansubject <- dfcluster2 %>% ggplot(aes(x=age, y=total_updrs, colour = as.factor(km.out.cluster))) + geom_point()
-actualsubject <- dfcluster2 %>% ggplot(aes(x=age, y=total_updrs, colour = as.factor(df.subject))) + geom_point()
+kmeansubject <- dfcluster2 %>% ggplot(aes(x=yld_rate, y=yll_rate, colour = as.factor(km.out.cluster))) + geom_point()
+actualsubject <- dfcluster2 %>% ggplot(aes(x=yld_rate, y=yll_rate, colour = as.factor(dfe_heart.region_name))) + geom_point()
 
 df1 <- data.frame(km.out$centers, km.out$size)
 names(df1)
-dfcluster2 %>% ggplot() + geom_point(mapping = aes(x=age, y=total_updrs, colour = as.factor(km.out.cluster))) + geom_point(data=df1, mapping=aes(age, total_updrs, size=km.out.size))
+dfcluster2 %>% ggplot() + geom_point(mapping = aes(x=yld_rate, y=yll_rate, colour = as.factor(km.out.cluster))) + geom_point(data=df1, mapping=aes(yld_rate, yll_rate, size=km.out.size))
 
-df2 %>% ggplot(aes(x=age, y = total_updrs, colour = sex2)) + geom_point()
+dfe_heart %>% ggplot(aes(x=yld_rate, y = yll_rate, colour = region_name)) + geom_point()
 
