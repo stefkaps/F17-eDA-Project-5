@@ -64,22 +64,6 @@ plot(regfit.full,scale="Cp")
 plot(regfit.full,scale="adjr2")
 coef(regfit.full,10)
 
-#region_name section# too big???
-regfit.full=regsubsets(as.factor(region_name)~.,data=df, nvmax=37)
-reg.summary=summary(regfit.full)
-names(reg.summary)
-plot(reg.summary$cp,xlab="Number of Variables",ylab="Cp")
-which.min(reg.summary$cp)
-
-plot(reg.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
-which.max(reg.summary$adjr2)
-
-summary(regfit.full)
-
-plot(regfit.full,scale="Cp")
-plot(regfit.full,scale="adjr2")
-coef(regfit.full,10)
-
 ##Forwards and Backwards Selection Section##
 df_numeric=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
 df_numeric=dplyr::sample_n(df_numeric, 10000)
@@ -100,6 +84,28 @@ which.max(regfwd.summary$adjr2)
 
 plot(regfwd.summary$cp,xlab="Number of Variables",ylab="Cp")
 plot(regfwd.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
+
+#forward region_name with LRI# Not using for now.
+LRI <- c('Oth LRI', 'LRI-RSV', 'LRI-HiHB', 'LRI-Pneum', 'LRI-Flu')
+
+df_LRI <- df %>% dplyr::filter(., cause_short %in% LRI)
+
+attach(df_LRI)
+
+regfit.fwd=regsubsets(as.factor(region_name)~.,data=df_LRI,nvmax=37,method="forward")
+summary(regfit.fwd)
+
+plot(regfit.fwd,scale="Cp")
+plot(regfit.fwd,scale="adjr2")
+
+regfwd.summary=summary(regfit.fwd)
+
+which.min(regfwd.summary$cp)
+which.max(regfwd.summary$adjr2)
+
+plot(regfwd.summary$cp,xlab="Number of Variables",ylab="Cp")
+plot(regfwd.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
+
 
 #Backward#
 regfit.bwd=regsubsets(death_abs~.,data=df_numeric,nvmax=37,method="backward")
@@ -187,7 +193,30 @@ plot(cv.lasso)
 
 coef(cv.lasso)
 
+#region_name section#
+LRI <- c('Oth LRI', 'LRI-RSV', 'LRI-HiHB', 'LRI-Pneum', 'LRI-Flu')
 
+df_LRI <- df %>% dplyr::filter(., cause_short %in% LRI)
+
+df_LRI <- na.omit(df_LRI)
+
+dfLRI_subset <- df_LRI %>% dplyr::select(., -cause_name, -cause_medium, -cause_name, -year, -age_name_unit, -sex_name)
+
+attach(dfLRI_subset)
+
+x=model.matrix(region_name~.-1,data=dfLRI_subset) 
+
+y=dfLRI_subset$region_name
+
+fit.lasso=glmnet(x,y,family="binomial")
+
+plot(fit.lasso,xvar="lambda",label=TRUE) 
+
+cv.lasso=cv.glmnet(x,y,family="binomial")
+
+plot(cv.lasso)
+
+coef(cv.lasso)
 
 
 
