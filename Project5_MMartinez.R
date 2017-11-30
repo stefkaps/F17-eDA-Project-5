@@ -218,6 +218,18 @@ plot(cv.lasso)
 
 coef(cv.lasso)
 
+##Principal Components Section##
+df_subset2 <- df %>% dplyr::select(., -cause_name, -cause_medium, -cause_short, -region_name, -year, -age_name_unit, -sex_name)
+df_nona2 <- na.omit(df_subset2)
+attach(df_nona2)
 
+dimnames(df_nona2)
+apply(df_nona2,2,mean)
+apply(df_nona2,2, var)
+
+pca.out=prcomp(df_nona2, scale=TRUE)
+pca.out
+names(pca.out)
+biplot(pca.out, scale=0)
 
 
