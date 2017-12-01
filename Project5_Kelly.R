@@ -7,6 +7,7 @@ require(tree)
 require(randomForest)
 require(gbm)
 require(e1071)
+require(ROCR)
 library(tidyverse)
 library(modelr)
 require(dplyr)
@@ -21,11 +22,41 @@ df <- data.world::query(
   dataset = project
 )
 
-
+### boosting death_abs
 dfb=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
 dfb=dplyr::sample_n(dfb, 3000)
 boost.df=gbm(death_abs~.,data=dfb,distribution="gaussian",n.trees=500,shrinkage=0.01,interaction.depth=4)
 summary(boost.df)
+
+### boosting sex
+dfb2=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -age_name_unit, -age_name_from, -age_name_upto) 
+dfb2 = dfb2 %>% dplyr::filter(sex_name %in% c("Male", "Female"))
+dfb2=dplyr::sample_n(dfb2, 3000)
+boost.df=gbm(as.factor(sex_name)~.,data=dfb2,distribution="gaussian",n.trees=500,shrinkage=0.01,interaction.depth=4)
+summary(boost.df)
+
+# Logistic Regression
+lda.fit=lda(Direction~Lag1+Lag2,data=Smarket, subset=Year<2005)
+lda.fit
+
+plot(lda.fit)
+Smarket.2005=subset(Smarket,Year==2005)
+lda.pred=predict(lda.fit,Smarket.2005)
+class(lda.pred)
+data.frame(lda.pred)[1:5,]
+df_lda = data.frame(lda.pred)
+ggplot(df_lda) + geom_histogram(mapping = aes(x=LD1)) + facet_wrap(~ class)
+ggplot(df_lda) + geom_boxplot(mapping = aes(x=class, y=LD1))
+table(lda.pred$class,Smarket.2005$Direction)
+mean(lda.pred$class==Smarket.2005$Direction)
+# roc curve
+table(lda.pred$class,Smarket.2005$Direction)
+df_conf = dplyr::bind_cols(Smarket.2005, df_lda)
+#View(df_conf)
+df_ldaclass = df_conf %>% dplyr::mutate(newClass = ifelse(posterior.Up > .52, 'Up', 'Down'))
+#View(df_ldaclass)
+table(df_ldaclass$newClass,Smarket.2005$Direction)
+
 
 # k means clustering
 
