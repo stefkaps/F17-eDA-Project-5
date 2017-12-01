@@ -122,18 +122,35 @@ lda_df = data.frame(lda.pred)
 table(lda.pred$class,testE10$region_binary) #confusion matrix
 mean(lda.pred$class==testE10$region_binary) #bad mean
 
+
 # QDA
-#1 age+rpde+ppe+total_updrs predicting sex2
-qda1.fit = qda(sex2 ~ age + rpde + ppe + total_updrs,
-               data=df, subset=train)
-qda1.fit
-qda1.pred = predict(qda1.fit, test)
-table(qda1.pred$class,test$sex2)
-mean(qda1.pred$class==test$sex2)
+
+qda.fit.region=qda(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_from+daly_abs_ui_from+yld_rate_ui_upto,data=dfE10b,subset=trainE10)
+
+qda.fit.region
+qda.pred = predict(qda.fit.region, testE10)
+table(qda.pred$class,testE10$region_binary)
+mean(qda.pred$class==testE10$region_binary)
 
 
-# KNN
-predictorsKNN=cbind(age, motor_updrs, total_updrs, jitter, jitter_abs, jitter_ppq5, rpde, dfa, ppe)
-knn7.pred=class::knn(predictorsKNN7[train, ],predictorsKNN7[test_knn,],sex2[train],k=1)
-table(knn7.pred,sex2[test_knn])
-mean(knn7.pred==sex2[test_knn])
+# KNN - NOt WORKING
+dfE10b = dfE10 %>% dplyr::select(.,-cause_name,-cause_medium,-cause_short,-year,-age_name_unit,-age_name_from, -age_name_upto) %>% dplyr::mutate(sex_name = as.factor(sex_name)) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name)
+
+dfE10bna = na.omit(dfE10b)
+names(dfE10bna)
+trainE10 = sample(1:nrow(dfE10bna), 7000)
+testE10 = dfE10bna[-trainE10,]
+names(testE10)
+testE10knn = sample(1:nrow(testE10),7000)
+
+predictorsKNN=cbind(yll_rate_ui_upto,daly_rate_ui_upto,yld_abs_ui_from,daly_abs_ui_from,yld_rate_ui_upto)
+knn.pred=class::knn(predictorsKNN[trainE10,],predictorsKNN[testE10knn,],region_binary[trainE10],k=1)
+table(knn.pred,region_binary[testE10knn])
+mean(knn.pred==region_binary[testE10knn])
+
+
+
+
+### Interpretation of predictors
+"age range can be used to predict the quantitative variables because age should affect mortality. However,it might be difficult to use because it has so many categories.
+Age range should be excluded when predicting the categorical variables because it appears the same number of times for every category by design. Likewise, each categorical variable is actually not designed to predict other categorical variables."
