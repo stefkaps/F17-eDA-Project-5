@@ -36,6 +36,8 @@ summary(boost.df)
 
 
 ### Lasso
+
+#Lasso for yll_abs
 df1=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
 df1=dplyr::sample_n(df1, 10000)
 
@@ -57,4 +59,92 @@ cv.lasso=cv.glmnet(x,y,family="gaussian")
 plot(cv.lasso)
 # get the coefficients for what it thinks is the best model
 coef(cv.lasso)
+
+
+
+### Best Subset Selection
+
+#Best Subset Selection for yll_abs
+df2=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from, -yll_abs)
+df2=dplyr::sample_n(df2, 10000)
+
+attach(df2)
+
+regfit.full=regsubsets(yll_abs~.,data=df2, nvmax=37)
+reg.summary=summary(regfit.full)
+names(reg.summary)
+plot(reg.summary$cp,xlab="Number of Variables",ylab="Cp")
+which.min(reg.summary$cp)
+
+plot(reg.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
+which.max(reg.summary$adjr2)
+
+summary(regfit.full)
+
+plot(regfit.full,scale="Cp")
+plot(regfit.full,scale="adjr2")
+coef(regfit.full,10)
+
+
+
+###Forwards and Backwards Selection Section
+
+#Forward#
+regfit.fwd=regsubsets(yll_abs~.,data=df2,nvmax=37,method="forward")
+summary(regfit.fwd)
+
+plot(regfit.fwd,scale="Cp")
+plot(regfit.fwd,scale="adjr2")
+
+regfwd.summary=summary(regfit.fwd)
+
+which.min(regfwd.summary$cp)
+which.max(regfwd.summary$adjr2)
+
+plot(regfwd.summary$cp,xlab="Number of Variables",ylab="Cp")
+plot(regfwd.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
+
+#Backward#
+regfit.bwd=regsubsets(yll_abs~.,data=df2,nvmax=37,method="backward")
+summary(regfit.bwd)
+
+plot(regfit.bwd,scale="Cp")
+plot(regfit.bwd,scale="adjr2")
+
+regbwd.summary=summary(regfit.bwd)
+
+which.min(regbwd.summary$cp)
+which.max(regbwd.summary$adjr2)
+
+plot(regbwd.summary$cp,xlab="Number of Variables",ylab="Cp")
+plot(regbwd.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
+
+
+
+### Random Forest yll_abs
+df3=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
+df3=dplyr::sample_n(df3, 10000)
+
+df3_nona = na.omit(df3)
+
+attach(df3_nona)
+
+set.seed(101)
+dim(df3_nona)
+train=sample(1:nrow(df3_nona),4457)
+
+rf.yll_abs=randomForest(yll_abs~.,data=df3_nona,subset=train)
+rf.yll_abs
+
+oob.err=double(20)
+test.err=double(20)
+for(mtry in 1:20){
+  fit=randomForest(yll_abs~.,data=df3_nona,subset=train,mtry=mtry,ntree=400)
+  oob.err[mtry]=fit$mse[400]
+  pred=predict(fit,df3_nona[-train,])
+  test.err[mtry]=with(df3_nona[-train,],mean((yll_abs-pred)^2))
+  cat(mtry," ")
+}
+matplot(1:mtry,cbind(test.err,oob.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
+legend("topright",legend=c("OOB","Test"),pch=19,col=c("red","blue"))
 
