@@ -86,38 +86,41 @@ dfE10 <- data.world::query(
 )
 
 head(dfE10)
+#### good variables to exclude ####
 dfE10c = dfE10 %>% dplyr::select(.,-cause_name,-cause_medium,-cause_short,-year,-age_name_unit,-age_name_from, -age_name_upto) %>% dplyr::mutate(sex_name = as.factor(sex_name)) %>% dplyr::mutate(region_name = as.factor(region_name))
 dfE10b = dfE10 %>% dplyr::select(.,-cause_name,-cause_medium,-cause_short,-year,-age_name_unit,-age_name_from, -age_name_upto) %>% dplyr::mutate(sex_name = as.factor(sex_name)) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name)
 trainE10 = sample(1:nrow(dfE10b), 10000)
+testE10 = dfE10b[-train,]
 
-boost.europe=gbm(region_name~.,data=dfE10c[trainE10,],distribution="gaussian", n.trees=10000,shrinkage=0.01,interaction.depth = 4)
+boost.europe=gbm(region_name~.,data=dfE10c[trainE10,],distribution="gaussian", n.trees=1000,shrinkage=0.01,interaction.depth = 4)
 summary(boost.europe)
 
+n.trees=seq(from=100,to=1000,by=100)
+# use number of trees (going by hundreds) to make predictions
+predmat=predict(boost.europe,newdata=dfE10c[-train,],n.trees=n.trees)
+dim(predmat)
+# boosting error
+berr=with(dfE10c[-train,],apply( (predmat-region_name)^2,2,mean))
+plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error"); abline(h=min(berr),col="red")
+
 # Logistic Regression
-trainE10 = sample(1:nrow(dfE10b), 10000)
-glm.fit.region=glm(region_binary~.,data=dfE10b,family=binomial,subset=trainE10)
+glm.fit.region=glm(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_from+daly_abs_ui_from+yld_rate_ui_upto,data=dfE10b,family=binomial,subset=trainE10)
 summary(glm.fit.region)
+glm.probs=predict(glm.fit.region,newdata=testE10,type="response")
+glm.pred=ifelse(glm.probs>0.5,"1","0")
+region.test = testE10$region_binary
+table(glm.pred,region.test)
+mean(glm.pred==region.test)
 
-glm1.fit=glm(sex2 ~ age + rpde + ppe + total_updrs,
-             data=df, family=binomial,
-             subset=train)
-summary(glm1.fit)
-
-glm1.probs=predict(glm1.fit,newdata=test,type="response")
-glm1.pred=ifelse(glm1.probs>0.5,"1","0")
-sex2.test = test$sex2
-table(glm1.pred,sex2.test) #confusion matrix
-mean(glm1.pred==sex2.test) #bad mean
 
 # LDA
-#1 age+rpde+ppe+total_updrs predicting sex2
-lda1.fit=lda(sex2 ~ age + rpde + ppe + total_updrs,
-             data=df, subset=train)
-lda1.fit
-lda1.pred=predict(lda1.fit, test)
-lda1_df = data.frame(lda1.pred)
-table(lda1.pred$class,test$sex2) #confusion matrix
-mean(lda1.pred$class==test$sex2) #bad mean
+
+lda.fit.region=lda(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_from+daly_abs_ui_from+yld_rate_ui_upto,data=dfE10b,subset=trainE10)
+lda.fit.region
+lda.pred=predict(lda.fit.region, testE10)
+lda_df = data.frame(lda.pred)
+table(lda.pred$class,testE10$region_binary) #confusion matrix
+mean(lda.pred$class==testE10$region_binary) #bad mean
 
 # QDA
 #1 age+rpde+ppe+total_updrs predicting sex2
