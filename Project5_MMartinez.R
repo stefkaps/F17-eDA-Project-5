@@ -24,6 +24,8 @@ summary(df)
 
 attach(df)
 
+df_allyears <- df %>% dplyr::mutate(., age_name_from2 = ifelse(age_name_unit == "days", age_name_from/365, age_name_from)) %>% dplyr::mutate(., age_name_upto2 = ifelse(age_name_upto == "days", age_name_upto/365, age_name_upto)) %>% dplyr::select(., -age_name_upto, -age_name_from)
+
 ##Best Subset Selection Section##
 df_subset <- df %>% dplyr::select(., -cause_medium, -cause_short, -region_name, -year, -age_name_unit, -sex_name)
 attach(df_subset)
@@ -269,7 +271,7 @@ qda1.pred = predict(qda1.fit, test)
 table(qda1.pred$class,test$cause_name)
 mean(qda1.pred$class==test$cause_name)
 
-##Random Forests Section##
+##Random Forests Section## Remember to fix mtry
 df_deathabs=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
 set.seed(11)
 df_deathabs=dplyr::sample_n(df_deathabs, 10000)

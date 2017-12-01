@@ -37,10 +37,10 @@ sessionInfo()
 ```
 
 ## **Github Link** 
-
+[https://github.com/stefkaps/F17-eDA-Project-5](https://github.com/stefkaps/F17-eDA-Project-5)
 
 ## **Data.World Link**
-
+[https://data.world/tarrantrl/f-17-eda-project-5](https://data.world/tarrantrl/f-17-eda-project-5)
 
 ## **Connecting to data.world** 
 ```{r}
@@ -58,5 +58,5 @@ We created several dataframes for our analyses.
 
 ```
 ## **Introduction** 
-
+In our final project, we decided to examine 
 
