@@ -88,19 +88,22 @@ dfE10 <- data.world::query(
 head(dfE10)
 #### good variables to exclude ####
 dfE10c = dfE10 %>% dplyr::select(.,-cause_name,-cause_medium,-cause_short,-year,-age_name_unit,-age_name_from, -age_name_upto) %>% dplyr::mutate(sex_name = as.factor(sex_name)) %>% dplyr::mutate(region_name = as.factor(region_name))
-dfE10b = dfE10 %>% dplyr::select(.,-cause_name,-cause_medium,-cause_short,-year,-age_name_unit,-age_name_from, -age_name_upto) %>% dplyr::mutate(sex_name = as.factor(sex_name)) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name)
+dfE10b = dfE10 %>% dplyr::select(.,-cause_name,-cause_medium,-cause_short,-year,-age_name_unit,-age_name_from, -age_name_upto, -sex_name) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name) 
+#%>% dplyr::mutate(region_binary = as.factor(region_binary))
 trainE10 = sample(1:nrow(dfE10b), 10000)
-testE10 = dfE10b[-train,]
+testE10 = dfE10b[-trainE10,]
 
-boost.europe=gbm(region_name~.,data=dfE10c[trainE10,],distribution="gaussian", n.trees=1000,shrinkage=0.01,interaction.depth = 4)
+
+## Boosting 
+boost.europe=gbm(region_binary~.,data=dfE10b[trainE10,],distribution="gaussian", n.trees=1000,shrinkage=0.01,interaction.depth = 4)
 summary(boost.europe)
 
 n.trees=seq(from=100,to=1000,by=100)
 # use number of trees (going by hundreds) to make predictions
-predmat=predict(boost.europe,newdata=dfE10c[-train,],n.trees=n.trees)
+predmat=predict(boost.europe,newdata=dfE10b[-trainE10,],n.trees=n.trees)
 dim(predmat)
 # boosting error
-berr=with(dfE10c[-train,],apply( (predmat-region_name)^2,2,mean))
+berr=with(dfE10b[-trainE10,],apply( (predmat-region_binary)^2,2,mean))
 plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error"); abline(h=min(berr),col="red")
 
 # Logistic Regression
@@ -162,7 +165,10 @@ knn.pred=class::knn(predictorsKNN[trainE10,],predictorsKNN[testE10knn,],region_b
 table(knn.pred,region_binary[testE10knn])
 mean(knn.pred==region_binary[testE10knn])
 
-
+## Things to do:
+"get KNN working
+do K means to see if region clusters
+Do Boosting with binary region to get error"
 
 
 ### Interpretation of predictors

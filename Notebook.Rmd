@@ -102,3 +102,4 @@ In our final project, we decided to examine
 [LDA to predict sex]https://data.world/tarrantrl/f-17-eda-project-5/insights/546d9d99-645b-4454-b330-a1064e03b02f
 [ROC curve for prediction of sex]https://data.world/tarrantrl/f-17-eda-project-5/insights/179ec2db-7e86-4e53-b915-27a6df1c4eea
 [ROC curve for predicting region]https://data.world/tarrantrl/f-17-eda-project-5/insights/329b7f64-fbfc-47e0-9190-dc770ef387a1
+[Boosting for region revisited with error]https://data.world/tarrantrl/f-17-eda-project-5/insights/4fa586dd-90ff-4139-bdd5-1833c48e1b00
