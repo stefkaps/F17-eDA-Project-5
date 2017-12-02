@@ -36,27 +36,31 @@ boost.df=gbm(as.factor(sex_name)~.,data=dfb2,distribution="gaussian",n.trees=500
 summary(boost.df)
 
 # Logistic Regression
-lda.fit=lda(Direction~Lag1+Lag2,data=Smarket, subset=Year<2005)
+set.seed(1)
+df_binsex = df %>% dplyr::filter(sex_name %in% c("Male", "Female")) %>% dplyr::mutate(sexbin = ifelse(sex_name == "Male", 1, 0))
+train = sample(nrow(df_binsex), 25000)
+test = df_binsex[-train,]
+lda.fit=lda(sexbin~yll_rate_ui_upto+death_pct_ui_upto+yll_pct_ui_upto+yll_abs_ui_upto+yld_abs_ui_upto+yll_rate+daly_rate_ui_upto+yll_rate_ui_from+death_abs_ui_upto+yll_abs+daly_pct_ui_upto+yll_abs_ui_from+yll_pct+death_abs+death_rate_ui_from+daly_rate_ui_from,data=df_binsex, subset=train)
 lda.fit
-
 plot(lda.fit)
-Smarket.2005=subset(Smarket,Year==2005)
-lda.pred=predict(lda.fit,Smarket.2005)
-class(lda.pred)
-data.frame(lda.pred)[1:5,]
-df_lda = data.frame(lda.pred)
+lda.predsex=predict(lda.fit,test)
+df_lda = data.frame(lda.predsex)
 ggplot(df_lda) + geom_histogram(mapping = aes(x=LD1)) + facet_wrap(~ class)
 ggplot(df_lda) + geom_boxplot(mapping = aes(x=class, y=LD1))
-table(lda.pred$class,Smarket.2005$Direction)
-mean(lda.pred$class==Smarket.2005$Direction)
-# roc curve
-table(lda.pred$class,Smarket.2005$Direction)
-df_conf = dplyr::bind_cols(Smarket.2005, df_lda)
-#View(df_conf)
-df_ldaclass = df_conf %>% dplyr::mutate(newClass = ifelse(posterior.Up > .52, 'Up', 'Down'))
-#View(df_ldaclass)
-table(df_ldaclass$newClass,Smarket.2005$Direction)
-
+table(lda.predsex$class,test$sexbin)
+mean(lda.predsex$class==test$sexbin)
+# change threshold
+df_conf = dplyr::bind_cols(test, df_lda)
+df_ldaclass = df_conf %>% dplyr::mutate(newClass = ifelse(posterior.1 > .49, 1, 0))
+table(df_ldaclass$newClass,test$sexbin)
+mean(df_ldaclass$newClass==test$sexbin)
+#roc curve
+predroc <- prediction(df_conf$posterior.1,df_conf$sexbin)
+roc.perf1 = performance(predroc, measure = "tpr", x.measure = "fpr")
+plot(roc.perf1)
+abline(a=0, b= 1)
+auc = performance(predroc, measure = "auc")
+auc@y.values
 
 # k means clustering
 

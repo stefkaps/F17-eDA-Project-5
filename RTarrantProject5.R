@@ -122,6 +122,13 @@ lda_df = data.frame(lda.pred)
 table(lda.pred$class,testE10$region_binary) #confusion matrix
 mean(lda.pred$class==testE10$region_binary) #bad mean
 
+predroc2 <- prediction(lda_df$posterior.1,testE10$region_binary)
+roc.perf = performance(predroc2, measure = "tpr", x.measure = "fpr")
+plot(roc.perf)
+abline(a=0, b= 1)
+auc1 = performance(predroc2, measure = "auc")
+auc1@y.values
+
 
 # QDA
 
@@ -129,9 +136,16 @@ qda.fit.region=qda(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_f
 
 qda.fit.region
 qda.pred = predict(qda.fit.region, testE10)
+qda_df=data.frame(qda.pred)
 table(qda.pred$class,testE10$region_binary)
 mean(qda.pred$class==testE10$region_binary)
 
+predroc3 <- prediction(qda_df$posterior.1,testE10$region_binary)
+roc.perf2 = performance(predroc3, measure = "tpr", x.measure = "fpr")
+plot(roc.perf2)
+abline(a=0, b= 1)
+auc2 = performance(predroc3, measure = "auc")
+auc2@y.values
 
 # KNN - NOt WORKING
 dfE10b = dfE10 %>% dplyr::select(.,-cause_name,-cause_medium,-cause_short,-year,-age_name_unit,-age_name_from, -age_name_upto) %>% dplyr::mutate(sex_name = as.factor(sex_name)) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name)
