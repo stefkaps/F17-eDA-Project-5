@@ -60,3 +60,45 @@ We created several dataframes for our analyses.
 ## **Introduction** 
 In our final project, we decided to examine 
 
+## Death_abs
+
+## YLL_abs
+
+## Eastern vs Western Europe
+(k means?)
+
+## Cause
+
+## Unsupervised Learning
+
+## Insights
+[First Attempt at Best Subset Selection Predicting Cause]https://data.world/tarrantrl/f-17-eda-project-5/insights/01a30c5e-ac21-4b5e-867c-5ddc2f7e5e21
+[KNN on Cause]https://data.world/tarrantrl/f-17-eda-project-5/insights/473800c5-aa3e-4d22-9110-231e17944d4d
+[Pairs charts between subsets of predictors]https://data.world/tarrantrl/f-17-eda-project-5/insights/a1cd6a73-b94d-4c0e-af4b-3fa5beb40834
+[Boosting to find important predictors for death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/26c94e87-2611-4bcc-b851-6d938ff1e45d
+[Multi-predictor Linear Regression Model for death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/2c1db0df-9dae-4b4c-a816-d862f903a179
+[Boosting to Find Best Predictors of yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/743d8695-b85b-49ac-b537-05f0b554b809
+[Backwards, Forwards, and Best Subset Selection for death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/3350db18-efb4-4359-92bd-c64b0f3274f5
+[Lasso on death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/2d587ac9-73ff-49ec-9b48-1094cca839b1
+[Linear Regression on death_abs with Updated Predictors]https://data.world/tarrantrl/f-17-eda-project-5/insights/b4a21227-5c31-4120-9b0e-0c2e7207c9fc
+[Lasso Analysis on yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/5ff96be6-c362-4ae9-bd61-6e5c9409b0da
+[K means clustering on Ischemic Heart Disease and Stroke]https://data.world/tarrantrl/f-17-eda-project-5/insights/c055cd89-0846-444a-a63c-bcf5c80f7746
+[Linear Regression on yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/8593766c-f3de-4a3d-a054-a91dc9130785
+[Hierarchical Clustering on Ischemic Heart Disease and Stroke]https://data.world/tarrantrl/f-17-eda-project-5/insights/d8c6a10b-e3f5-4e5d-ba96-07aa2dc164f8
+[Cause of death]https://data.world/tarrantrl/f-17-eda-project-5/insights/1c0d5968-d862-429d-bc27-77f72e3a9f73
+[Lasso on region_name]https://data.world/tarrantrl/f-17-eda-project-5/insights/fffa3067-a1e1-451a-8159-e1aeb1a0bb79
+[PCA on Subset of the Data]https://data.world/tarrantrl/f-17-eda-project-5/insights/03e1d5df-1b45-4ba9-a218-ceef43276330
+[Boosting to predict cancer class]https://data.world/tarrantrl/f-17-eda-project-5/insights/4f220f02-ae27-4095-9491-19724fb702fc
+[Linear SVM on Yld Rate ~ Death Rate for Multiple Sclerosis]https://data.world/tarrantrl/f-17-eda-project-5/insights/b04d895b-d6a9-494d-80cd-ed9728a1f634
+[Radial SVM on Yld Rate ~ Death Rate for Multiple Sclerosis]https://data.world/tarrantrl/f-17-eda-project-5/insights/79072de3-484f-45cc-aa74-82f8cfda6589
+[Random Forest on death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/230157c7-8aed-4067-b57f-6b8bf34ab6f6
+[Boosting to distinguish eastern and western Europe]https://data.world/tarrantrl/f-17-eda-project-5/insights/d0b1119b-03e3-492b-8389-1ade40af2b55
+[Best Subset Selection for yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/e85e9b69-9203-4244-ad1d-a543c6c76036
+[Logistic regression for region]https://data.world/tarrantrl/f-17-eda-project-5/insights/8cd11f42-8408-44ba-8599-01f84a6c5627
+[Forward & Backwards Selection of yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/32178177-a72b-4064-a6e2-07a6422034e9
+[LDA and QDA for region classification]https://data.world/tarrantrl/f-17-eda-project-5/insights/9e6d23b8-58be-4148-a19f-0c5dbacda6c9
+[Boosting to distinguish Male and Female]https://data.world/tarrantrl/f-17-eda-project-5/insights/45e1626b-fdfc-4543-90f1-61b2dae599af
+[Random Forest on yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/e55cacf1-7100-42da-90bf-6bc2df4a3a0a
+[LDA to predict sex]https://data.world/tarrantrl/f-17-eda-project-5/insights/546d9d99-645b-4454-b330-a1064e03b02f
+[ROC curve for prediction of sex]https://data.world/tarrantrl/f-17-eda-project-5/insights/179ec2db-7e86-4e53-b915-27a6df1c4eea
+[ROC curve for predicting region]https://data.world/tarrantrl/f-17-eda-project-5/insights/329b7f64-fbfc-47e0-9190-dc770ef387a1
