@@ -33,6 +33,13 @@ dfb=dplyr::sample_n(dfb, 10000)
 boost.df=gbm(yll_abs~.,data=dfb,distribution="gaussian",n.trees=1000,shrinkage=0.01,interaction.depth=4)
 summary(boost.df)
 
+#Boosting  for yld_abs
+dfb2=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yld_abs_ui_upto, -yld_abs_ui_from)
+dfb2=dplyr::sample_n(dfb2, 10000)
+boost.df=gbm(yld_abs~.,data=dfb2,distribution="gaussian",n.trees=1000,shrinkage=0.01,interaction.depth=4)
+summary(boost.df)
+
+
 
 
 ### Lasso
@@ -59,6 +66,43 @@ cv.lasso=cv.glmnet(x,y,family="gaussian")
 plot(cv.lasso)
 # get the coefficients for what it thinks is the best model
 coef(cv.lasso)
+
+
+#Lasso for yld_abs
+dfb2=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yld_abs_ui_upto, -yld_abs_ui_from)
+dfb2=dplyr::sample_n(dfb2, 10000)
+
+dfb2_nona <- na.omit(dfb2)
+
+attach(dfb2_nona)
+
+# for this you have to pass in a matrix of x. You have to construct the x's
+x=model.matrix(yld_abs~.-1,data=dfb2_nona) 
+# and construct the y's
+y=dfb2_nona$yld_abs
+
+fit.lasso=glmnet(x,y,family="gaussian")
+# plot how lambda is changing against the model fit
+plot(fit.lasso,xvar="lambda",label=TRUE) # the one that disappears last is our best predictor
+# do cross validation for each lambda (default is kfold of 10 across 100 lambdas)
+cv.lasso=cv.glmnet(x,y,family="gaussian")
+# plot the cross validation mean squared errors of all 100 models
+plot(cv.lasso)
+# get the coefficients for what it thinks is the best model
+coef(cv.lasso)
+
+
+
+### Linear Regression
+#yld_abs w/ top 5 boosting predictors
+fit_yld_abs = lm(yld_abs~daly_abs + daly_abs_ui_upto + age_name_from + yll_abs_ui_upto + yld_rate_ui_from,data=dfb2_nona)
+fit_yld_abs
+summary(fit_yld_abs)
+
+#yld_abs w/ Lasso predictors
+fit_yld_abs = lm(yld_abs~death_abs + death_rate_ui_from + yll_abs + yll_abs_ui_from + yll_abs_ui_upto + yld_pct_ui_upto + yld_rate_ui_from + daly_abs + daly_abs_ui_upto,data=dfb2_nona)
+fit_yld_abs
+summary(fit_yld_abs)
 
 
 
@@ -151,3 +195,30 @@ legend("topright",legend=c("OOB","Test"),pch=19,col=c("red","blue"))
 
 
 ### 
+
+project <- "https://data.world/kellyjennings/disease"
+df10c <- data.world::query(
+  data.world::qry_sql("SELECT * FROM disease2010cancer"),
+  dataset = project
+)
+
+attach(df10c)
+df10c = df10c %>% dplyr::select(.,-cause_medium,-cause_short,-region_name,-year,-age_name_unit) %>% dplyr::mutate(sex_name = as.factor(sex_name))
+df10c_nona = na.omit(df10c)
+
+View(df10c)
+
+# for this you have to pass in a matrix of x. You have to construct the x's
+x=model.matrix(cause_name~.-1,data=df10c_nona) 
+# and construct the y's
+y=df10c_nona$cause_name
+
+fit.lasso=glmnet(x,y,family="multinomial")
+# plot how lambda is changing against the model fit
+plot(fit.lasso,xvar="lambda",label=TRUE) # the one that disappears last is our best predictor
+# do cross validation for each lambda (default is kfold of 10 across 100 lambdas)
+cv.lasso=cv.glmnet(x,y,family="multinomial")
+# plot the cross validation mean squared errors of all 100 models
+plot(cv.lasso)
+# get the coefficients for what it thinks is the best model
+coef(cv.lasso)
