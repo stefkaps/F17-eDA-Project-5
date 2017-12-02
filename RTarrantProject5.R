@@ -154,14 +154,15 @@ auc2@y.values
 dfE10b = dfE10 %>% dplyr::select(.,-cause_name,-cause_medium,-cause_short,-year,-age_name_unit,-age_name_from, -age_name_upto) %>% dplyr::mutate(sex_name = as.factor(sex_name)) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name)
 
 dfE10bna = na.omit(dfE10b)
-names(dfE10bna)
+attach(dfE10bna)
 trainE10 = sample(1:nrow(dfE10bna), 7000)
 testE10 = dfE10bna[-trainE10,]
-names(testE10)
+
 testE10knn = sample(1:nrow(testE10),7000)
 
 predictorsKNN=cbind(yll_rate_ui_upto,daly_rate_ui_upto,yld_abs_ui_from,daly_abs_ui_from,yld_rate_ui_upto)
 knn.pred=class::knn(predictorsKNN[trainE10,],predictorsKNN[testE10knn,],region_binary[trainE10],k=1)
+
 table(knn.pred,region_binary[testE10knn])
 mean(knn.pred==region_binary[testE10knn])
 
