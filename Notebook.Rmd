@@ -65,9 +65,14 @@ In our final project, we decided to examine
 ## YLL_abs
 
 ## Eastern vs Western Europe
-(k means?)
+Interesting finding: Boosting did significantly better than LR, LDA, QDA, or even KNN. K means clustering helps visualize why this might be the case.
+- Boosting model
+- LR, LDA, QDA, KNN
+- K means clustering
 
 ## Cause
+Because there were so many classes for cause, we did some analysis where we looked at subsets of the causes. This included looking at cancer and heart disease.
+- 
 
 ## Unsupervised Learning
 
