@@ -54,20 +54,49 @@ df <- data.world::query(
 
 ## Setup
 We created several dataframes for our analyses. 
+The first thing we did was convert the age to all be in units of years (since some measurements in the dataset were in days). We no longer needed the column age_name_unit after standardizing the age units.
+In addition, there were some variables that we excluded from all our analyses because they were not meaningful as predictors. These included cause_medium and cause_short, which were just different versions of the full cause name.
 ```{r}
+df_allyears <- df %>% dplyr::mutate(., age_name_from2 = ifelse(age_name_unit == "days", age_name_from/365, age_name_from)) %>% dplyr::mutate(., age_name_upto2 = ifelse(age_name_upto == "days", age_name_upto/365, age_name_upto)) %>% dplyr::select(., -age_name_upto, -age_name_from,-age_name_unit, -cause_medium, -cause_short)
 
 ```
 ## **Introduction** 
-In our final project, we decided to examine a fairly large dataset regarding global burden of disease. This dataset, provided by a study done by the Insitute for Health Metrics and Evaluation, inluded information on number of deaths, death percent, death rate, years of life lost, years of life lived with a disability, life years adjusted for diability, and the causes of these measures. Throughout or analyses of these data, we generally focused on Europe, rather than the whole dataset (Western and Eastern Europe). However, we looked at a variety of subsets of the data, inlcuding specific years, specific disease types, etc. There was a lot to be learned here, but the areas we gave particular attention to were: 
+In our final project, we decided to examine a fairly large dataset regarding the global burden of disease. This dataset, provided by a study done by the Insitute for Health Metrics and Evaluation, inluded information on number of deaths, death percent, death rate, years of life lost, years of life lived with a disability, life years adjusted for diability, and the causes of these measures. Throughout our analyses of these data, we generally focused on Europe, rather than the whole dataset (Western and Eastern Europe). However, we looked at a variety of subsets of the data, inlcuding specific years, specific disease types, etc. There was a lot to be learned here, but the areas we gave particular attention to were: 
 
 ## Death_abs
 Interesting finding: The model based on boosting predictors did somewhat better in terms of adjusted r-squared than a model based on predictors found in both lasso and boosting analyses. The differences are very small, and, in fact, we see that the standard error for the two predictors used in the second model may be smaller than the standard error for the same predictors in the previous model. However, when we only look at r-squared values, we see the following order in terms of performance- Model 1 (yll_abs_ui_from, yll_abs, yll_abs_ui_upto), Random Forest, Model 2 (yll_abs_ui_from, yll_abs).
--Boosting
+-Boosting (for this analysis, we excluded categorical variables for ease of computation. We also excluded death_abs_ui_upto and death_abs_ui_from because these are different aspects of the death_abs measurement itself and are therefore not valid predictors of death_abs)
+```{r}
+df_deathabs=dplyr::select(df_allyears, -cause_name, -region_name, -sex_name, -death_abs_ui_upto, -death_abs_ui_from)
+set.seed(1)
+train_deathabs = sample(1:nrow(df_deathabs),7000)
+#dfb=dplyr::sample_n(dfb, 3000)
+boost.deathabs=gbm(death_abs~.,data=df_deathabs[train_deathabs,],distribution="gaussian",n.trees=1000,shrinkage=0.01,interaction.depth=4)
+summary(boost.deathabs,plotit=FALSE)
+```
+This selected yll_abs_ui_from, yll_abs, death_pct_ui_from, daly_abs, and yll_abs_ui_upto as the variables that contributed the most.
+```{r} 
+# SOMETHING ISN'T RIGHT WITH THIS
+df_test_deathabs = df_deathabs[-train_deathabs,]
+test_deathabs = sample(1:nrow(df_test_deathabs),7000)
+
+n.trees=seq(from=100,to=1000,by=100)
+predmat_deathabs=predict(boost.deathabs,newdata=df_test_deathabs[test_deathabs,],n.trees=n.trees)
+summary(predmat_deathabs)
+
+berr_deathabs=with(df_test_deathabs[test_deathabs,],apply( (predmat_deathabs-death_abs)^2,2,mean))
+renderPlot({
+  plot(n.trees,berr_deathabs,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error")
+  abline(h=min(berr_deathabs),col="red")
+})
+```
+
 -Subsequent linear regression
 -Backwards/forwards/best subset? (No analysis on predictors gleaned from this. Maybe don't include?)
 -Lasso on death abs
 -Subsequent updated linear regression (fared worse in terms of adjr2. Intercept doubles practically. std. error actually goes down a lot for predictors though- I previously missed/misinterpreted this. I can make a comment on the post if need be. Or we can just mention it here. Take a look to confirm please. Either way it won't affect insight numbers.)
 -Random forest on death_abs (similar r2, sits between original LR and updated LR)
+
 ## YLL_abs
 Interesting finding: The predictors chosen in both boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. Interstingly, best subset selection, and backwards and forwards stepwise selection show the best models around 2-3 predictors, and then get continually worse from there. We have never seen this particular distribution before, and looked out our analyses for quite a while. We believe this may just be a consequence of the data (possibly due to correlated values). 
 -Boosting
