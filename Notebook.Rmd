@@ -1,5 +1,5 @@
 ---
-title: "Working Title"
+title: "Final Project: Global Burden of Disease"
 author: 'Group 2: Kelly Jennings, Stefanos Kapetanakis, Marcus Martinez, Rachel Tarrant, Changyong Yi'
 resource_files:
 - .Renviron
@@ -58,11 +58,24 @@ We created several dataframes for our analyses.
 
 ```
 ## **Introduction** 
-In our final project, we decided to examine 
+In our final project, we decided to examine a fairly large dataset regarding global burden of disease. This dataset, provided by a study done by the Insitute for Health Metrics and Evaluation, inluded information on number of deaths, death percent, death rate, years of life lost, years of life lived with a disability, life years adjusted for diability, and the causes of these measures. Throughout or analyses of these data, we generally focused on Europe, rather than the whole dataset (Western and Eastern Europe). However, we looked at a variety of subsets of the data, inlcuding specific years, specific disease types, etc. There was a lot to be learned here, but the areas we gave particular attention to were: 
 
 ## Death_abs
-
+Interesting finding: The model based on boosting predictors did somewhat better in terms of adjusted r-squared than a model based on predictors found in both lasso and boosting analyses. The differences are very small, and, in fact, we see that the standard error for the two predictors used in the second model may be smaller than the standard error for the same predictors in the previous model. However, when we only look at r-squared values, we see the following order in terms of performance- Model 1 (yll_abs_ui_from, yll_abs, yll_abs_ui_upto), Random Forest, Model 2 (yll_abs_ui_from, yll_abs).
+-Boosting
+-Subsequent linear regression
+-Backwards/forwards/best subset? (No analysis on predictors gleaned from this. Maybe don't include?)
+-Lasso on death abs
+-Subsequent updated linear regression (fared worse in terms of adjr2. Intercept doubles practically. std. error actually goes down a lot for predictors though- I previously missed/misinterpreted this. I can make a comment on the post if need be. Or we can just mention it here. Take a look to confirm please. Either way it won't affect insight numbers.)
+-Random forest on death_abs (similar r2, sits between original LR and updated LR)
 ## YLL_abs
+Interesting finding: The predictors chosen in both boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. Interstingly, best subset selection, and backwards and forwards stepwise selection show the best models around 2-3 predictors, and then get continually worse from there. We have never seen this particular distribution before, and looked out our analyses for quite a while. We believe this may just be a consequence of the data (possibly due to correlated values). 
+-Boosting
+-Lasso
+-Linear regression
+-Best subset selection
+-Forwards/backwards
+-Random forests
 
 ## Eastern vs Western Europe
 Interesting finding: Boosting did significantly better than LR, LDA, QDA, or even KNN. K means clustering helps visualize why this might be the case.
@@ -72,9 +85,15 @@ Interesting finding: Boosting did significantly better than LR, LDA, QDA, or eve
 
 ## Cause
 Because there were so many classes for cause, we did some analysis where we looked at subsets of the causes. This included looking at cancer and heart disease.
-- 
+- Best subset selection
+-KNN
 
 ## Unsupervised Learning
+-K-means on ischemic heart disease/stroke
+-Hierarchical clustering on ischemic heart disease/stroke
+Intersting finding: After looking at a scatterplot of yld_rate vs yll_rate for only data regarding Ischemic heart disease and stroke in Europe, we noticed a natural and cleare separation between Western and Eastern Europe. Interestingly, K-means clustering didn't separate the data as we would have expected it to, which was possibly due to one of the centroids used by the analysis being focused in a highly clustered area (data points from both regious were very close together). Data around the other centroid had points that were mostly belonging to Eastern Europe, which was mostly correct. Had our data been a bit more spread out, K-means clustering may have done a better job. Compared to K-means clustering, hierarchical clustering (complete, single, and average) did a much worse job. Overall, the closest Hierarchical came to K-means results (which were already not perfect), was using the complete method. 
+-PCA on subset of data
+Intersting finding: The predictors displayed in the biplot of this analysis were clustered by type (death rate predictors grouped together, years of life lost predictrors grouped together, etc.). This makes sense, conisdering they are usually pretty standard variations of each other. (Need to further interpret this biplot.)
 
 ## Insights
 [First Attempt at Best Subset Selection Predicting Cause]https://data.world/tarrantrl/f-17-eda-project-5/insights/01a30c5e-ac21-4b5e-867c-5ddc2f7e5e21
