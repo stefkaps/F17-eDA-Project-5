@@ -150,7 +150,7 @@ abline(a=0, b= 1)
 auc2 = performance(predroc3, measure = "auc")
 auc2@y.values
 
-# KNN - NOt WORKING
+# KNN
 dfE10b = dfE10 %>% dplyr::select(.,-cause_name,-cause_medium,-cause_short,-year,-age_name_unit,-age_name_from, -age_name_upto) %>% dplyr::mutate(sex_name = as.factor(sex_name)) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name)
 
 dfE10bna = na.omit(dfE10b)
@@ -165,6 +165,14 @@ knn.pred=class::knn(predictorsKNN[trainE10,],predictorsKNN[testE10knn,],region_b
 
 table(knn.pred,region_binary[testE10knn])
 mean(knn.pred==region_binary[testE10knn])
+
+## K means
+km_region_x = dfE10c%>% dplyr::select(yll_rate_ui_upto,daly_rate_ui_upto)
+km.out=kmeans(km_region_x,2)
+km.out
+par(mfrow = c(1, 2))
+plot(km_region_x,col=km.out$cluster,cex=2,main = "K means clustering", pch=1,lwd=2)
+plot(km_region_x,col=as.factor(dfE10c$region_name),cex=2,main = "Actual",pch=1,lwd=2)
 
 ## Things to do:
 "get KNN working

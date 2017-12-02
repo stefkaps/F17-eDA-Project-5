@@ -104,3 +104,4 @@ In our final project, we decided to examine
 [ROC curve for predicting region]https://data.world/tarrantrl/f-17-eda-project-5/insights/329b7f64-fbfc-47e0-9190-dc770ef387a1
 [Boosting for region revisited with error]https://data.world/tarrantrl/f-17-eda-project-5/insights/4fa586dd-90ff-4139-bdd5-1833c48e1b00
 [KNN for region]https://data.world/tarrantrl/f-17-eda-project-5/insights/8f97ddc5-c6e4-405d-8168-c895a40381dd
+[K means clustering for region]https://data.world/tarrantrl/f-17-eda-project-5/insights/abcaf28b-e8ca-416f-a41a-6322507d52c8
