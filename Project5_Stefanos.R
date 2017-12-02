@@ -136,9 +136,9 @@ train=sample(1:nrow(df3_nona),4457)
 rf.yll_abs=randomForest(yll_abs~.,data=df3_nona,subset=train)
 rf.yll_abs
 
-oob.err=double(20)
-test.err=double(20)
-for(mtry in 1:20){
+oob.err=double(37)
+test.err=double(37)
+for(mtry in 1:37){
   fit=randomForest(yll_abs~.,data=df3_nona,subset=train,mtry=mtry,ntree=400)
   oob.err[mtry]=fit$mse[400]
   pred=predict(fit,df3_nona[-train,])
@@ -148,3 +148,6 @@ for(mtry in 1:20){
 matplot(1:mtry,cbind(test.err,oob.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
 legend("topright",legend=c("OOB","Test"),pch=19,col=c("red","blue"))
 
+
+
+### 
