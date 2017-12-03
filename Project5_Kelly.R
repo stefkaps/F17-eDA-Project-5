@@ -134,11 +134,11 @@ ygrid=predict(svmfit,xgrid)
 
 beta=drop(t(svmfit$coefs)%*%x_svm[svmfit$index,])
 beta0=svmfit$rho
-plot(xgrid,col=c("yellow","blue")[as.numeric(ygrid)],pch=20,cex=.2)
 tonum=function(ysvm){
   tonumberdf = dfe_ms %>% dplyr::mutate(sex_name2 = ifelse(sex_name == "Male", 1, 0))
   tonumberdf$sex_name2
 }
+plot(xgrid,col=c("yellow","blue")[as.numeric(ygrid)],pch=20,cex=.2)
 points(x_svm,col=tonum(df)+2,pch=19)
 points(x_svm[svmfit$index,],pch=5,cex=2)
 abline(beta0/beta[2],-beta[1]/beta[2])
