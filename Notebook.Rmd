@@ -109,6 +109,26 @@ Interesting finding: The predictors chosen in both boosting and lasso analyses f
 ## Eastern vs Western Europe
 Interesting finding: Boosting did significantly better than LR, LDA, QDA, or even KNN. K means clustering helps visualize why this might be the case.
 - Boosting model
+```{r}
+df_region = df_allyears %>% dplyr::select(.,-cause_name,-year,-age_name_from, -age_name_upto, -sex_name) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name)
+
+#%>% dplyr::mutate(region_binary = as.factor(region_binary))
+train_region = sample(1:nrow(df_region), 10000)
+df_test_region = df_region[-train_region,]
+test_region = sample(1:nrow(df_test_region), 10000)
+
+
+## Boosting 
+boost.europe=gbm(region_binary~.,data=df_region[train_region,],distribution="gaussian", n.trees=1000,shrinkage=0.01,interaction.depth = 4)
+summary(boost.europe)
+
+n.trees=seq(from=100,to=1000,by=100)
+predmat_region=predict(boost.europe,newdata=df_test_region[test_region,],n.trees=n.trees)
+dim(predmat)
+# boosting error
+berr_region=with(df_test_region[test_region,],apply( (predmat_region-region_binary)^2,2,mean))
+plot(n.trees,berr_region,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error"); abline(h=min(berr_region),col="red")
+```
 - LR, LDA, QDA, KNN
 - K means clustering
 
