@@ -371,7 +371,74 @@ berr_region=with(df_test_region[test_region,],apply( (predmat_region-region_bina
 plot(n.trees,berr_region,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error"); abline(h=min(berr_region),col="red")
 ```
 - LR, LDA, QDA, KNN
+```{r}
+# Logistic Regression
+glm.fit.region=glm(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_from+daly_abs_ui_from+yld_rate_ui_upto,data=df_region,family=binomial,subset=train_region)
+summary(glm.fit.region)
+glm.probs=predict(glm.fit.region,newdata=df_test_region[test_region,],type="response")
+glm.pred=ifelse(glm.probs>0.5,"1","0")
+region.test = df_test_region[test_region,]$region_binary
+table(glm.pred,region.test)
+mean(glm.pred==region.test)
+```
+
+```{r}
+# LDA
+
+lda.fit.region=lda(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_from+daly_abs_ui_from+yld_rate_ui_upto,data=df_region,subset=train_region)
+lda.fit.region
+lda.pred=predict(lda.fit.region, df_test_region[test_region,])
+lda_df = data.frame(lda.pred)
+table(lda.pred$class,df_test_region[test_region,]$region_binary) #confusion matrix
+mean(lda.pred$class==df_test_region[test_region,]$region_binary) #bad mean
+
+predroc2 <- prediction(lda_df$posterior.1,df_test_region[test_region,]$region_binary)
+roc.perf = performance(predroc2, measure = "tpr", x.measure = "fpr")
+plot(roc.perf)
+abline(a=0, b= 1)
+auc1 = performance(predroc2, measure = "auc")
+auc1@y.values
+```
+
+```{r}
+# QDA
+
+qda.fit.region=qda(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_from+daly_abs_ui_from+yld_rate_ui_upto,data=df_region,subset=train_region)
+
+qda.fit.region
+qda.pred = predict(qda.fit.region, df_test_region[test_region,])
+qda_df=data.frame(qda.pred)
+table(qda.pred$class,df_test_region[test_region,]$region_binary)
+mean(qda.pred$class==df_test_region[test_region,]$region_binary)
+
+predroc3 <- prediction(qda_df$posterior.1,df_test_region[test_region,]$region_binary)
+roc.perf2 = performance(predroc3, measure = "tpr", x.measure = "fpr")
+plot(roc.perf2)
+abline(a=0, b= 1)
+auc2 = performance(predroc3, measure = "auc")
+auc2@y.values
+```
+
+```{r}
+# KNN
+attach(df_region)
+
+predictorsKNN=cbind(yll_rate_ui_upto,daly_rate_ui_upto,yld_abs_ui_from,daly_abs_ui_from,yld_rate_ui_upto)
+knn.pred=class::knn(predictorsKNN[train_region,],predictorsKNN[test_region,],region_binary[train_region],k=1)
+
+table(knn.pred,region_binary[test_region])
+mean(knn.pred==region_binary[test_region])
+```
 - kmeans
+```{r}
+## K means
+km_region_x = df_region%>% dplyr::select(yll_rate_ui_upto,daly_rate_ui_upto)
+km.out=kmeans(km_region_x,2)
+km.out
+par(mfrow = c(1, 2))
+plot(km_region_x,col=km.out$cluster,cex=2,main = "K means clustering", pch=1,lwd=2)
+plot(km_region_x,col=as.factor(df_region$region_name),cex=2,main = "Actual",pch=1,lwd=2)
+```
 
 ## Cause
 Because there were so many classes for cause, we did some analysis where we looked at subsets of the causes. This included looking at cancer and heart disease.
