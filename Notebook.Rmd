@@ -351,7 +351,7 @@ boost.dfb=gbm(yll_abs~.,data=df_yll_abs_b,distribution="gaussian",n.trees=200,sh
 summary(boost.dfb, plotit=FALSE)
 ```
 
-It makes sense that the number of death predictors are the best predictors for years of life lost since people with diseases are more likely to have years of their lives lost due to dying from the disease. 
+The top 7 predictors chosen in this boosting analysis for yll_abs were death_abs_ui_upto, daly_abs_ui_from, death_abs, death_abs_ui_from, daly_abs, daly_abs_ui_upto, & death_pct_ui_from. It makes sense that the number of death predictors are the best predictors for years of life lost since people with diseases are more likely to have years of their lives lost due to dying from the disease. 
 
 ### Model 1 Linear Regression with Boosting Predictors
 
