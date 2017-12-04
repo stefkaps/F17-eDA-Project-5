@@ -84,22 +84,26 @@ summary(boost.deathabs,plotit=FALSE)
 This selected yll_abs_ui_from, yll_abs, death_pct_ui_from, daly_abs, and yll_abs_ui_upto as the variables that contributed the most.
 
 ```{r} 
-# SOMETHING ISN'T RIGHT WITH THIS
-# df_test_deathabs = df_deathabs[-train_deathabs,]
-# test_deathabs = sample(1:nrow(df_test_deathabs),7000)
-# n.trees=seq(from=100,to=1000,by=100)
-# predmat_deathabs=predict(boost.deathabs,newdata=df_test_deathabs[test_deathabs,],n.trees=n.trees)
-# summary(predmat_deathabs)
-# berr_deathabs=with(df_test_deathabs[test_deathabs,],apply( (predmat_deathabs-death_abs)^2,2,mean))
-# renderPlot({
-#   plot(n.trees,berr_deathabs,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error")
-#   abline(h=min(berr_deathabs),col="red")
-# })
+# SOMETHING ISN'T RIGHT WITH THIS- 55000000 mse
+df_test_deathabs = df_deathabs[-train_deathabs,]
+test_deathabs = sample(1:nrow(df_test_deathabs),7000)
+n.trees_d=seq(from=100,to=500,by=100)
+predmat_deathabs=predict(boost.deathabs,newdata=df_test_deathabs[test_deathabs,],n.trees=n.trees_d)
+summary(predmat_deathabs)
+berr_deathabs=with(df_test_deathabs[test_deathabs,],apply( (predmat_deathabs-death_abs)^2,2,mean))
 ```
 
+```{r}
+renderPlot({
+  plot(n.trees_d,berr_deathabs,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error")
+  abline(h=min(berr_deathabs),col="red")
+})
+```
+
+
 ### Model 1 Linear Regression
-!!!This insight- https://data.world/tarrantrl/f-17-eda-project-5/insights/2c1db0df-9dae-4b4c-a816-d862f903a179
-The code is the same as the LR model below, just with the third predictor.!!!
+
+Having seen the predictors the boosting model chose as the "best," we decided to see how they would fare in classic linear regression.
 
 ```{r}
 df_deathabs_lr1=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
@@ -111,6 +115,7 @@ fitDeathAbs1
 summary(fitDeathAbs1)
 ```
 
+As you can see above, the results were pretty good! Namely, we had a fairly high r-squared value and a very small p-value.
 
 ### Backwards/Forwards Stepwise Selection
 
@@ -402,7 +407,7 @@ renderPlot({
 })
 ```
 
-We ran 500 trees in this model (for a reasonable loading time), and the prediction error is a lot better than using LR, LDA, or QDA. While those had an accuracy from 51-58%, this model has an error rate that almost gets down to 0.18, corresponding to a prediction accuracy of 82%.
+We ran 500 trees in this model (for a reasonable loading time), and the prediction error is a lot better than using LR, LDA, or QDA. While those had an accuracy from 51-65%, this model has an error rate that almost gets down to 0.18, corresponding to a prediction accuracy of 82%.
 
 ### Logistic Regression
 
@@ -568,11 +573,11 @@ km.out=kmeans(x_km,2)
 ```
 
 ```{r}
-renderPlot(plot(x_km,col=km.out$cluster,cex=2,main = "K means clustering", pch=1,lwd=2))
 renderPlot(plot(x_km,col=as.factor(dfe_heart$region_name),cex=2,main = "Actual",pch=1,lwd=2))
+renderPlot(plot(x_km,col=km.out$cluster,cex=2,main = "K means clustering", pch=1,lwd=2))
 ```
 
-Interesting finding: After looking at a scatterplot of yld_rate vs yll_rate for only data regarding Ischemic heart disease and stroke in Europe, we noticed a natural and clear separation between Western and Eastern Europe. Interestingly, K-means clustering didn't separate the data as we would have expected it to, which was possibly due to one of the centroids used by the analysis being focused in a highly clustered area (data points from both regions were very close together). Data around the other centroid had points that were mostly belonging to Eastern Europe, which was mostly correct. Had our data been a bit more spread out, K-means clustering may have done a better job. 
+Interesting finding: After looking at a scatterplot of yld_rate vs yll_rate for only data regarding Ischemic heart disease and stroke in Europe, we noticed a natural separation between Western and Eastern Europe (on top). Interestingly, K-means clustering didn't separate the data as we would have expected it to, which was possibly due to one of the centroids used by the analysis being focused in a highly clustered area (data points from both regions were very close together). Data around the other centroid had points that were mostly belonging to Eastern Europe, which was mostly correct. Had our data been a bit more spread out, K-means clustering may have done a better job. 
 
 
 ### Hierarchical Clustering 
