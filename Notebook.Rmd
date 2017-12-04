@@ -161,7 +161,7 @@ DALY Rate Years Lived with Disability (YLD) Rate Per 100,000
 DALY Rate (UI Min.) Years Lived with Disability (YLD) Rate Per 100,000 - 95% Uncertainty Interval Minimum Value
 
 DALY Rate (UI Max.) Years Lived with Disability (YLD) Rate Per 100,000 - 95% Uncertainty Interval Maximum Value" 
-This description is taken from the original source: [Institute for Health Metrics and Evaluation - Global Burden of Disease.]http://www.healthmetricsandevaluation.org/ghdx/record/global-burden-disease-study-2010-gbd-2010-results-cause-1990-2010
+This description is taken from the original source: [Institute for Health Metrics and Evaluation - Global Burden of Disease.](http://www.healthmetricsandevaluation.org/ghdx/record/global-burden-disease-study-2010-gbd-2010-results-cause-1990-2010)
 
 Throughout our analyses of these data, we generally focused on Europe  (Western and Eastern Europe), rather than the whole dataset. However, we looked at a variety of subsets of the data, including specific years, specific disease types, etc. There was a lot to be learned here, but the areas we gave particular attention to were: 
 
@@ -260,7 +260,7 @@ renderPlot(plot(regbwd.summary$cp,xlab="Number of Variables",ylab="Cp"))
 renderPlot(plot(regbwd.summary$adjr2,xlab="Number of Variables",ylab="adjr2"))
 ```
 
-As you can see, in the above plots for forward and backward stepwise selection, they produced relatively similar results, suggesting the best model lies between 27-29 predictors.
+As you can see, in the above plots for forward and backward stepwise selection, they produced relatively similar results, suggesting the best model uses the majority of our predictors.
 
 ### Lasso on death_abs
 
@@ -335,10 +335,10 @@ renderPlot({
 })
 ```
 
-As mentioned in the overview above, this random forest analysis yields similar results in terms of r-squared as both the above linear regression models. In fact, it's r-squared value lies right in the middle.
+As mentioned in the overview above, this random forest analysis yields similar results in terms of r-squared as both the above linear regression models. In fact, its r-squared value lies right in the middle.
 
 ## YLL_abs
-Interesting finding: The predictors chosen in both boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. Interstingly, best subset selection, and backwards and forwards stepwise selection show the best models around 2-3 predictors, and then get continually worse from there. We have never seen this particular distribution before, and so we looked at our analyses for quite a while. We believe this may just be a consequence of the data (possibly due to correlated values). 
+Interesting finding: The predictors chosen in both boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. Interestingly, best subset selection, and backwards and forwards stepwise selection show the best models around 2-3 predictors, and then get continually worse from there. We have never seen this particular distribution before, and so we looked at our analyses for quite a while. We believe this may just be a consequence of the data (possibly due to correlated values). 
 
 ### Boosting Model
 
@@ -551,7 +551,7 @@ region.test = df_test_region_na[test_region_na,]$region_binary
 table(glm.pred,region.test)
 mean(glm.pred==region.test)
 ```
-The prediction accuracy for LR was 64%, which is significantly worse than the boosting accuracy.
+The prediction accuracy for LR was around 64%, which is significantly worse than the boosting accuracy.
 
 ### LDA
 
@@ -567,7 +567,7 @@ lda_df = data.frame(lda.pred)
 table(lda.pred$class,df_test_region[test_region,]$region_binary)
 mean(lda.pred$class==df_test_region[test_region,]$region_binary)
 ```
-The prediction accuracy for this model was 54%, which is essentially no better than flipping a coin.
+The prediction accuracy for this model was around 54%, which is essentially no better than flipping a coin.
 
 ```{r}
 predroc2 <- prediction(lda_df$posterior.1,df_test_region[test_region,]$region_binary)
@@ -596,7 +596,7 @@ qda_df=data.frame(qda.pred)
 table(qda.pred$class,df_test_region[test_region,]$region_binary)
 mean(qda.pred$class==df_test_region[test_region,]$region_binary)
 ```
-The prediction accuracy for this was even worse than LDA at 51.5%.
+The prediction accuracy for this was even worse than LDA at around 51%.
 
 ```{r}
 predroc3 <- prediction(qda_df$posterior.1,df_test_region[test_region,]$region_binary)
@@ -627,13 +627,13 @@ knn.pred=class::knn(predictorsKNN[train_region,],predictorsKNN[test_region,],reg
 table(knn.pred,region_binary[test_region])
 mean(knn.pred==region_binary[test_region])
 ```
-KNN did about as well as LR with a prediction accuracy of 68%.
+KNN did about as well as LR with a prediction accuracy of around 68%.
 
 ### K Means Clustering
 
 [K means clustering for region](https://data.world/tarrantrl/f-17-eda-project-5/insights/abcaf28b-e8ca-416f-a41a-6322507d52c8)
 
-In order to gain insight as to why boosting may have done so much better than than the other model types, we did K means clustering using two clusters and the top two predictors from boosting.
+In order to gain insight as to why boosting may have done so much better than the other model types, we did K means clustering using two clusters and the top two predictors from boosting.
 ```{r}
 ## K means
 km_region_x = df_region%>% dplyr::select(yll_rate_ui_upto,daly_rate_ui_upto)
@@ -645,7 +645,7 @@ km.out1=kmeans(km_region_x,2)
 renderPlot(plot(km_region_x,col=km.out1$cluster,cex=2,main = "K means clustering", pch=1,lwd=2))
 renderPlot(plot(km_region_x,col=as.factor(df_region$region_binary),cex=2,main = "Actual",pch=1,lwd=2))
 ```
-The clustering compared to the real region classification shows that K means is unable to disctinguish between the regions in the lower left part of the graph due to extreme overlap. However, the upper right is dominated by one class. Perhaps the simpler model types are unable to distinguish between the classes due to overlap. However, the slow learning quality of boosting may allow it to find the nuanced differences between the classes. 
+The clustering compared to the real region classification shows that K means is unable to distinguish between the regions in the lower left part of the graph due to extreme overlap. However, the upper right is dominated by one class. Perhaps the simpler model types are unable to distinguish between the classes due to overlap. However, the slow learning quality of boosting may allow it to find the nuanced differences between the classes. 
 
 ## Support Vector Machine: Multiple Sclerosis for Male vs Females
 
