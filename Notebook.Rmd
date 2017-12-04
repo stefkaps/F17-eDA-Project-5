@@ -338,7 +338,7 @@ renderPlot({
 As mentioned in the overview above, this random forest analysis yields similar results in terms of r-squared as both the above linear regression models. In fact, its r-squared value lies right in the middle.
 
 ## YLL_abs
-Interesting finding: The predictors chosen in both the boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. This linear regression model was a much better fit than just using the predictors chosen from boosting. Also, the linear regression model using just the predictors from the lasso analysis seemed to overfit. Interestingly, best subset selection showed the best model is around 12 predictors, foreward selection showed the best model is around 8 predictors, and backwards selection showed the best model is around 4 predictors. It was interesting these selections chose models with such different numbers of predictors.
+Interesting findings: The predictors chosen in both the boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. The linear regression model that only used the predictors from boosting was the best fit. Also, the linear regression model using just the predictors from the lasso analysis seemed to overfit. Interestingly, best subset selection showed the best model is around 12 predictors, foreward selection showed the best model is around 8 predictors, and backwards selection showed the best model is around 4 predictors. It was interesting these selections chose models with such different numbers of predictors.
 
 ### Boosting Model
 
@@ -367,7 +367,7 @@ fitYLLAbs
 summary(fitYLLAbs)
 ```
 
-In this linear regression model, we used the top 7 predictors from the boosting analysis to predit yll_abs. The small p-value shows that these are good predictors for yll_abs. Also, the r-squared was fairly high.
+In this linear regression model, we used the top 7 predictors from the boosting analysis to predict yll_abs. The small p-value shows that these are good predictors for yll_abs. Also, the r-squared was fairly high.
 
 
 ### Lasso
@@ -410,7 +410,7 @@ fitYLLAbs = lm(yll_abs~death_abs_ui_upto + death_pct + yld_abs + yld_abs_ui_from
 fitYLLAbs
 summary(fitYLLAbs)
 ```
-This model is too perfect, since the adjusted r-squared is 1. We believe that this is due to overfitting. Due to this, we made another linear regression model that only used the predictors that were included in both the boosting and lasso anlyses. This model can be seen in the next section.
+This model is too perfect, since the adjusted r-squared is 1. We believe that this is due to overfitting. Due to this, we made another linear regression model that only used the predictors that were included in both the boosting and lasso analyses. This model can be seen in the next section.
 
 ### Model 3 Linear Regression with Boosting & Lasso Predictors
 
@@ -428,7 +428,7 @@ fitYLLAbs
 summary(fitYLLAbs)
 ```
 
-In this model, we used the predictors death_abs_ui_upto, daly_abs, and daly_abs_ui_from. We chose these predictors since they were the ones that were included in both the lasso and boosting anlyses. The small p-values are more evidence that these three predictors are good at predicting yll_abs. Also, the r-squared was fairly high, and higher than that of the first model. This model was much better than the previous one too, where we used only the top 7 predictors from the boosting analysis. 
+In this model, we used the predictors death_abs_ui_upto, daly_abs, and daly_abs_ui_from. We chose these predictors since they were the ones that were included in both the lasso and boosting analyses. The small p-values are more evidence that these three predictors are good at predicting yll_abs. Also, the r-squared was fairly high, and higher than that of the second model, where we used only the top 7 predictors from the boosting analysis. Although, this model was not better than, but very close, the first model where we only used the boosting predictors.
 
 
 ### Best Subset Selection
