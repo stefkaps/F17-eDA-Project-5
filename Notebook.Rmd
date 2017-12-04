@@ -169,6 +169,9 @@ Throughout our analyses of these data, we generally focused on Europe  (Western 
 Interesting finding: The model based on boosting predictors did somewhat better in terms of adjusted r-squared than a model based on predictors found in both lasso and boosting analyses. The differences are very small, and, in fact, we see that the standard error for the two predictors used in the second model may be smaller than the standard error for the same predictors in the previous model. However, when we only look at r-squared values, we see the following order in terms of performance- Model 1 (yll_abs_ui_from, yll_abs, yll_abs_ui_upto), Random Forest, Model 2 (yll_abs_ui_from, yll_abs).
 
 ### Boosting Model
+
+[Boosting to find important predictors for death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/26c94e87-2611-4bcc-b851-6d938ff1e45d)
+
 For this analysis, we excluded categorical variables for ease of computation. We also excluded death_abs_ui_upto and death_abs_ui_from because these are different aspects of the death_abs measurement itself and are therefore not valid predictors of death_abs.
 
 ```{r}
@@ -183,24 +186,25 @@ summary(boost.deathabs,plotit=FALSE)
 This selected yll_abs_ui_from, yll_abs, death_pct_ui_from, daly_abs, and yll_abs_ui_upto as the variables that contributed the most.
 
 ```{r} 
-# SOMETHING ISN'T RIGHT WITH THIS- 55000000 mse
-df_test_deathabs = df_deathabs[-train_deathabs,]
-test_deathabs = sample(1:nrow(df_test_deathabs),7000)
-n.trees_d=seq(from=100,to=500,by=100)
-predmat_deathabs=predict(boost.deathabs,newdata=df_test_deathabs[test_deathabs,],n.trees=n.trees_d)
-summary(predmat_deathabs)
-berr_deathabs=with(df_test_deathabs[test_deathabs,],apply( (predmat_deathabs-death_abs)^2,2,mean))
-```
-
-```{r}
-renderPlot({
-  plot(n.trees_d,berr_deathabs,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error")
-  abline(h=min(berr_deathabs),col="red")
-})
+# # SOMETHING ISN'T RIGHT WITH THIS- 55000000 mse
+# df_test_deathabs = df_deathabs[-train_deathabs,]
+# test_deathabs = sample(1:nrow(df_test_deathabs),7000)
+# n.trees_d=seq(from=100,to=500,by=100)
+# predmat_deathabs=predict(boost.deathabs,newdata=df_test_deathabs[test_deathabs,],n.trees=n.trees_d)
+# summary(predmat_deathabs)
+# berr_deathabs=with(df_test_deathabs[test_deathabs,],apply( (predmat_deathabs-death_abs)^2,2,mean))
+# ```
+# ```{r}
+# renderPlot({
+#   plot(n.trees_d,berr_deathabs,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error")
+#   abline(h=min(berr_deathabs),col="red")
+# })
 ```
 
 
 ### Model 1 Linear Regression
+
+[Multi-predictor Linear Regression Model for death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/2c1db0df-9dae-4b4c-a816-d862f903a179)
 
 Having seen the predictors the boosting model chose as the "best," we decided to see how they would fare in classic linear regression.
 
@@ -217,6 +221,8 @@ summary(fitDeathAbs1)
 As you can see above, the results were pretty good! Namely, we had a fairly high r-squared value and a very small p-value.
 
 ### Backwards/Forwards Stepwise Selection
+
+[Backwards, Forwards, and Best Subset Selection for death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/3350db18-efb4-4359-92bd-c64b0f3274f5)
 
 ```{r}
 df_deathabs_bs=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
@@ -258,6 +264,8 @@ As you can see, in the above plots for forward and backward stepwise selection, 
 
 ### Lasso on death_abs
 
+[Lasso on death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/2d587ac9-73ff-49ec-9b48-1094cca839b1)
+
 ```{r}
 df_deathabs_lasso=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
 df_deathabs_lasso=dplyr::sample_n(df_deathabs_lasso, 10000)
@@ -279,7 +287,8 @@ This yielded similar results to the original boosting model, but ultimately excl
 
 
 ### Model 2 Linear Regression
-!!!(fared worse in terms of adjr2. Intercept doubles practically. std. error actually goes down a lot for predictors though- I previously missed/misinterpreted this. I can make a comment on the post if need be. Or we can just mention it here. Take a look to confirm please. Either way it won't affect insight numbers.)!!!
+
+[Linear Regression on death_abs with Updated Predictors](https://data.world/tarrantrl/f-17-eda-project-5/insights/b4a21227-5c31-4120-9b0e-0c2e7207c9fc)
 
 ```{r}
 df_deathabs_lr=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
@@ -291,6 +300,8 @@ summary(fitDeathAbs)
 ```
 
 ### Random Forest on death_abs
+
+[Random Forest on death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/230157c7-8aed-4067-b57f-6b8bf34ab6f6)
 
 The random forest code takes a long time to run, so this is just a sample. See the more accurate results in this insight [here.](https://data.world/tarrantrl/f-17-eda-project-5/insights/230157c7-8aed-4067-b57f-6b8bf34ab6f6)
 
@@ -331,6 +342,8 @@ Interesting finding: The predictors chosen in both boosting and lasso analyses f
 
 ### Boosting Model
 
+[Boosting to Find Best Predictors of yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/743d8695-b85b-49ac-b537-05f0b554b809)
+
 ```{r}
 df_yll_abs_b=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
 df_yll_abs_b=dplyr::sample_n(df_yll_abs_b, 10000)
@@ -342,6 +355,8 @@ It makes sense that the number of death predictors are the best predictors for y
 
 
 ### Lasso
+
+[Lasso Analysis on yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/5ff96be6-c362-4ae9-bd61-6e5c9409b0da)
 
 ```{r}
 df_yll_abs_l=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
@@ -369,7 +384,9 @@ renderPlot(plot(fit.lasso1,xvar="lambda",label=TRUE))
 renderPlot(plot(cv.lasso1))
 ```
 
-### Linear regression
+### Linear Regression
+
+[Linear Regression on yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/8593766c-f3de-4a3d-a054-a91dc9130785)
 
 ```{r}
 df_yll_abs_lr=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit)
@@ -386,6 +403,8 @@ The small p values are more evidence that death_abs_ui_upto, daly_abs, daly_abs_
 
 
 ### Best Subset Selection
+
+[Best Subset Selection for yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/e85e9b69-9203-4244-ad1d-a543c6c76036)
 
 ```{r}
 df_yll_abs_sub=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
@@ -442,6 +461,8 @@ renderPlot(plot(regbwd.summary1$adjr2,xlab="Number of Variables",ylab="adjr2"))
 
 ### Random Forest
 
+[Random Forest on yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/e55cacf1-7100-42da-90bf-6bc2df4a3a0a)
+
 The random forest code takes a long time to run, so this is just a sample. See the more accurate results in this insight [here.](https://data.world/tarrantrl/f-17-eda-project-5/insights/e55cacf1-7100-42da-90bf-6bc2df4a3a0a)
 
 ```{r}
@@ -480,6 +501,10 @@ From the many regions originally available in the global database, we chose to f
 
 ### Boosting Model
 
+[Boosting to distinguish eastern and western Europe](https://data.world/tarrantrl/f-17-eda-project-5/insights/d0b1119b-03e3-492b-8389-1ade40af2b55)
+
+[Boosting for region revisited with error](https://data.world/tarrantrl/f-17-eda-project-5/insights/4fa586dd-90ff-4139-bdd5-1833c48e1b00)
+
 ```{r}
 df_region = df_allyears %>% dplyr::select(.,-cause_name,-year, -sex_name) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name)
 
@@ -508,6 +533,9 @@ renderPlot({
 We ran 500 trees in this model (for a reasonable loading time), and the prediction error is a lot better than using LR, LDA, or QDA. While those had an accuracy from 51-65%, this model has an error rate that almost gets down to 0.18, corresponding to a prediction accuracy of 82%. The top predictors chosen for this model were yll_rate_ui_upto, daly_rate_ui_upto, daly_abs_ui_from, yld_abs_ui_from, yld_rate_ui_upto.
 
 ### Logistic Regression
+
+[Logistic regression for region](https://data.world/tarrantrl/f-17-eda-project-5/insights/8cd11f42-8408-44ba-8599-01f84a6c5627)
+
 Next, we took the top five predictors from boosting and made a logistic regression model.
 ```{r}
 # Logistic Regression
@@ -526,6 +554,10 @@ mean(glm.pred==region.test)
 The prediction accuracy for LR was 64%, which is significantly worse than the boosting accuracy.
 
 ### LDA
+
+[LDA and QDA for region classification](https://data.world/tarrantrl/f-17-eda-project-5/insights/9e6d23b8-58be-4148-a19f-0c5dbacda6c9)
+
+[ROC curve for predicting region](https://data.world/tarrantrl/f-17-eda-project-5/insights/329b7f64-fbfc-47e0-9190-dc770ef387a1)
 
 ```{r}
 lda.fit.region=lda(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_from+daly_abs_ui_from+yld_rate_ui_upto,data=df_region,subset=train_region)
@@ -583,6 +615,8 @@ renderPlot({
 
 ### KNN
 
+[KNN for region](https://data.world/tarrantrl/f-17-eda-project-5/insights/8f97ddc5-c6e4-405d-8168-c895a40381dd)
+
 ```{r}
 # KNN
 attach(df_region)
@@ -596,6 +630,9 @@ mean(knn.pred==region_binary[test_region])
 KNN did about as well as LR with a prediction accuracy of 68%.
 
 ### K Means Clustering
+
+[K means clustering for region](https://data.world/tarrantrl/f-17-eda-project-5/insights/abcaf28b-e8ca-416f-a41a-6322507d52c8)
+
 In order to gain insight as to why boosting may have done so much better than than the other model types, we did K means clustering using two clusters and the top two predictors from boosting.
 ```{r}
 ## K means
@@ -611,6 +648,9 @@ renderPlot(plot(km_region_x,col=as.factor(df_region$region_binary),cex=2,main = 
 The clustering compared to the real region classification shows that K means is unable to disctinguish between the regions in the lower left part of the graph due to extreme overlap. However, the upper right is dominated by one class. Perhaps the simpler model types are unable to distinguish between the classes due to overlap. However, the slow learning quality of boosting may allow it to find the nuanced differences between the classes. 
 
 ## Support Vector Machine: Multiple Sclerosis for Male vs Females
+
+[Linear SVM on Yld Rate ~ Death Rate for Multiple Sclerosis](https://data.world/tarrantrl/f-17-eda-project-5/insights/b04d895b-d6a9-494d-80cd-ed9728a1f634)
+
 We used support vector machines to classify the Yld Rate vs Death Rate plot for Multiple Sclerosis in Europe by male and female points.
 First we used a linear SVM:
 
@@ -652,6 +692,8 @@ renderPlot({
 
 As you can see, the linear decision boundary puts most of the female points (red) on the top and most of the male points on the bottom of the boundary. A large amount of the points are support vector points. Unfortunately, it has very large margins probably because the separation between the classes is not linear. Thus we used a radial kernel next:
 
+[Radial SVM on Yld Rate ~ Death Rate for Multiple Sclerosis](https://data.world/tarrantrl/f-17-eda-project-5/insights/79072de3-484f-45cc-aa74-82f8cfda6589)
+
 ```{r}
 x_try2=subset(dfe_ms, select = c(yld_rate, death_rate))
 x_svm2=matrix(unlist(x_try2), ncol = 2)
@@ -669,6 +711,8 @@ Women with multiple sclerosis tend to have a higher death rate and higher rate o
 
 ### K-means Clustering
 
+[K means clustering on Ischemic Heart Disease and Stroke](https://data.world/tarrantrl/f-17-eda-project-5/insights/c055cd89-0846-444a-a63c-bcf5c80f7746)
+
 ```{r}
 dfe_heart = df %>% dplyr::filter(region_name %in% c("Eastern Europe", "Western Europe") & cause_name %in% c("Ischemic heart disease", "Ischemic stroke") & age_name_unit == "years")
 x_km = dfe_heart%>%dplyr::select(yld_rate, yll_rate)
@@ -684,6 +728,8 @@ Interesting finding: After looking at a scatterplot of yld_rate vs yll_rate for 
 
 
 ### Hierarchical Clustering 
+
+[Hierarchical Clustering on Ischemic Heart Disease and Stroke](https://data.world/tarrantrl/f-17-eda-project-5/insights/d8c6a10b-e3f5-4e5d-ba96-07aa2dc164f8)
 
 ```{r}
 hc.complete=hclust(dist(x_km),method="complete")
@@ -704,6 +750,8 @@ Compared to K-means clustering, hierarchical clustering (complete, single, and a
 
 ### PCA on subset of data
 
+[PCA on Subset of the Data](https://data.world/tarrantrl/f-17-eda-project-5/insights/03e1d5df-1b45-4ba9-a218-ceef43276330)
+
 ```{r}
 df_subset2 <- df %>% dplyr::select(., -cause_name, -cause_medium, -cause_short, -region_name, -year, -age_name_unit, -sex_name)
 df_nona_pca <- na.omit(df_subset2)
@@ -723,36 +771,81 @@ Interesting finding: The predictors displayed in the biplot of this analysis wer
 
 
 ## Insights
-[First Attempt at Best Subset Selection Predicting Cause]https://data.world/tarrantrl/f-17-eda-project-5/insights/01a30c5e-ac21-4b5e-867c-5ddc2f7e5e21
-[KNN on Cause]https://data.world/tarrantrl/f-17-eda-project-5/insights/473800c5-aa3e-4d22-9110-231e17944d4d
-[Pairs charts between subsets of predictors]https://data.world/tarrantrl/f-17-eda-project-5/insights/a1cd6a73-b94d-4c0e-af4b-3fa5beb40834
-[Boosting to find important predictors for death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/26c94e87-2611-4bcc-b851-6d938ff1e45d
-[Multi-predictor Linear Regression Model for death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/2c1db0df-9dae-4b4c-a816-d862f903a179
-[Boosting to Find Best Predictors of yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/743d8695-b85b-49ac-b537-05f0b554b809
-[Backwards, Forwards, and Best Subset Selection for death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/3350db18-efb4-4359-92bd-c64b0f3274f5
-[Lasso on death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/2d587ac9-73ff-49ec-9b48-1094cca839b1
-[Linear Regression on death_abs with Updated Predictors]https://data.world/tarrantrl/f-17-eda-project-5/insights/b4a21227-5c31-4120-9b0e-0c2e7207c9fc
-[Lasso Analysis on yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/5ff96be6-c362-4ae9-bd61-6e5c9409b0da
-[K means clustering on Ischemic Heart Disease and Stroke]https://data.world/tarrantrl/f-17-eda-project-5/insights/c055cd89-0846-444a-a63c-bcf5c80f7746
-[Linear Regression on yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/8593766c-f3de-4a3d-a054-a91dc9130785
-[Hierarchical Clustering on Ischemic Heart Disease and Stroke]https://data.world/tarrantrl/f-17-eda-project-5/insights/d8c6a10b-e3f5-4e5d-ba96-07aa2dc164f8
-[Cause of death]https://data.world/tarrantrl/f-17-eda-project-5/insights/1c0d5968-d862-429d-bc27-77f72e3a9f73
-[Lasso on region_name]https://data.world/tarrantrl/f-17-eda-project-5/insights/fffa3067-a1e1-451a-8159-e1aeb1a0bb79
-[PCA on Subset of the Data]https://data.world/tarrantrl/f-17-eda-project-5/insights/03e1d5df-1b45-4ba9-a218-ceef43276330
-[Boosting to predict cancer class]https://data.world/tarrantrl/f-17-eda-project-5/insights/4f220f02-ae27-4095-9491-19724fb702fc
-[Linear SVM on Yld Rate ~ Death Rate for Multiple Sclerosis]https://data.world/tarrantrl/f-17-eda-project-5/insights/b04d895b-d6a9-494d-80cd-ed9728a1f634
-[Radial SVM on Yld Rate ~ Death Rate for Multiple Sclerosis]https://data.world/tarrantrl/f-17-eda-project-5/insights/79072de3-484f-45cc-aa74-82f8cfda6589
-[Random Forest on death_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/230157c7-8aed-4067-b57f-6b8bf34ab6f6
-[Boosting to distinguish eastern and western Europe]https://data.world/tarrantrl/f-17-eda-project-5/insights/d0b1119b-03e3-492b-8389-1ade40af2b55
-[Best Subset Selection for yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/e85e9b69-9203-4244-ad1d-a543c6c76036
-[Logistic regression for region]https://data.world/tarrantrl/f-17-eda-project-5/insights/8cd11f42-8408-44ba-8599-01f84a6c5627
-[Forward & Backwards Selection of yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/32178177-a72b-4064-a6e2-07a6422034e9
-[LDA and QDA for region classification]https://data.world/tarrantrl/f-17-eda-project-5/insights/9e6d23b8-58be-4148-a19f-0c5dbacda6c9
-[Boosting to distinguish Male and Female]https://data.world/tarrantrl/f-17-eda-project-5/insights/45e1626b-fdfc-4543-90f1-61b2dae599af
-[Random Forest on yll_abs]https://data.world/tarrantrl/f-17-eda-project-5/insights/e55cacf1-7100-42da-90bf-6bc2df4a3a0a
-[LDA to predict sex]https://data.world/tarrantrl/f-17-eda-project-5/insights/546d9d99-645b-4454-b330-a1064e03b02f
-[ROC curve for prediction of sex]https://data.world/tarrantrl/f-17-eda-project-5/insights/179ec2db-7e86-4e53-b915-27a6df1c4eea
-[ROC curve for predicting region]https://data.world/tarrantrl/f-17-eda-project-5/insights/329b7f64-fbfc-47e0-9190-dc770ef387a1
-[Boosting for region revisited with error]https://data.world/tarrantrl/f-17-eda-project-5/insights/4fa586dd-90ff-4139-bdd5-1833c48e1b00
-[KNN for region]https://data.world/tarrantrl/f-17-eda-project-5/insights/8f97ddc5-c6e4-405d-8168-c895a40381dd
-[K means clustering for region]https://data.world/tarrantrl/f-17-eda-project-5/insights/abcaf28b-e8ca-416f-a41a-6322507d52c8
+
+[First Attempt at Best Subset Selection Predicting Cause](https://data.world/tarrantrl/f-17-eda-project-5/insights/01a30c5e-ac21-4b5e-867c-5ddc2f7e5e21)
+
+[KNN on Cause](https://data.world/tarrantrl/f-17-eda-project-5/insights/473800c5-aa3e-4d22-9110-231e17944d4d)
+
+[Pairs charts between subsets of predictors](https://data.world/tarrantrl/f-17-eda-project-5/insights/a1cd6a73-b94d-4c0e-af4b-3fa5beb40834)
+
+[Boosting to find important predictors for death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/26c94e87-2611-4bcc-b851-6d938ff1e45d)
+
+[Multi-predictor Linear Regression Model for death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/2c1db0df-9dae-4b4c-a816-d862f903a179)
+
+[Boosting to Find Best Predictors of yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/743d8695-b85b-49ac-b537-05f0b554b809)
+
+[Backwards, Forwards, and Best Subset Selection for death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/3350db18-efb4-4359-92bd-c64b0f3274f5)
+
+[Lasso on death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/2d587ac9-73ff-49ec-9b48-1094cca839b1)
+
+[Linear Regression on death_abs with Updated Predictors](https://data.world/tarrantrl/f-17-eda-project-5/insights/b4a21227-5c31-4120-9b0e-0c2e7207c9fc)
+
+[Lasso Analysis on yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/5ff96be6-c362-4ae9-bd61-6e5c9409b0da)
+
+[K means clustering on Ischemic Heart Disease and Stroke](https://data.world/tarrantrl/f-17-eda-project-5/insights/c055cd89-0846-444a-a63c-bcf5c80f7746)
+
+[Linear Regression on yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/8593766c-f3de-4a3d-a054-a91dc9130785)
+
+[Hierarchical Clustering on Ischemic Heart Disease and Stroke](https://data.world/tarrantrl/f-17-eda-project-5/insights/d8c6a10b-e3f5-4e5d-ba96-07aa2dc164f8)
+
+[Cause of death](https://data.world/tarrantrl/f-17-eda-project-5/insights/1c0d5968-d862-429d-bc27-77f72e3a9f73)
+
+[Lasso on region_name](https://data.world/tarrantrl/f-17-eda-project-5/insights/fffa3067-a1e1-451a-8159-e1aeb1a0bb79)
+
+[PCA on Subset of the Data](https://data.world/tarrantrl/f-17-eda-project-5/insights/03e1d5df-1b45-4ba9-a218-ceef43276330)
+
+[Boosting to predict cancer class](https://data.world/tarrantrl/f-17-eda-project-5/insights/4f220f02-ae27-4095-9491-19724fb702fc)
+
+[Linear SVM on Yld Rate ~ Death Rate for Multiple Sclerosis](https://data.world/tarrantrl/f-17-eda-project-5/insights/b04d895b-d6a9-494d-80cd-ed9728a1f634)
+
+[Radial SVM on Yld Rate ~ Death Rate for Multiple Sclerosis](https://data.world/tarrantrl/f-17-eda-project-5/insights/79072de3-484f-45cc-aa74-82f8cfda6589)
+
+[Random Forest on death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/230157c7-8aed-4067-b57f-6b8bf34ab6f6)
+
+[Boosting to distinguish eastern and western Europe](https://data.world/tarrantrl/f-17-eda-project-5/insights/d0b1119b-03e3-492b-8389-1ade40af2b55)
+
+[Best Subset Selection for yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/e85e9b69-9203-4244-ad1d-a543c6c76036)
+
+[Logistic regression for region](https://data.world/tarrantrl/f-17-eda-project-5/insights/8cd11f42-8408-44ba-8599-01f84a6c5627)
+
+[Forward & Backwards Selection of yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/32178177-a72b-4064-a6e2-07a6422034e9)
+
+[LDA and QDA for region classification](https://data.world/tarrantrl/f-17-eda-project-5/insights/9e6d23b8-58be-4148-a19f-0c5dbacda6c9)
+
+[Boosting to distinguish Male and Female](https://data.world/tarrantrl/f-17-eda-project-5/insights/45e1626b-fdfc-4543-90f1-61b2dae599af)
+
+[Random Forest on yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/e55cacf1-7100-42da-90bf-6bc2df4a3a0a)
+
+[LDA to predict sex](https://data.world/tarrantrl/f-17-eda-project-5/insights/546d9d99-645b-4454-b330-a1064e03b02f)
+
+[ROC curve for prediction of sex](https://data.world/tarrantrl/f-17-eda-project-5/insights/179ec2db-7e86-4e53-b915-27a6df1c4eea)
+
+[ROC curve for predicting region](https://data.world/tarrantrl/f-17-eda-project-5/insights/329b7f64-fbfc-47e0-9190-dc770ef387a1)
+
+[Boosting for region revisited with error](https://data.world/tarrantrl/f-17-eda-project-5/insights/4fa586dd-90ff-4139-bdd5-1833c48e1b00)
+
+[KNN for region](https://data.world/tarrantrl/f-17-eda-project-5/insights/8f97ddc5-c6e4-405d-8168-c895a40381dd)
+
+[K means clustering for region](https://data.world/tarrantrl/f-17-eda-project-5/insights/abcaf28b-e8ca-416f-a41a-6322507d52c8)
+
+[Boosting to Find Best Predictors of yld_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/9fa7fa8b-13b6-4e72-ae9c-03b558fee303)
+
+[Lasso on yld_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/0f970af9-b27c-4049-aef1-1e79ee846b33)
+
+[Linear Regression on yld_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/07a06299-cdac-4027-89fc-affed3ef0ec0)
+
+[Linear Regression on yld_abs with Lasso Predictors](https://data.world/tarrantrl/f-17-eda-project-5/insights/89615283-c198-4282-a4de-3b2308414449)
+
+
+
+
