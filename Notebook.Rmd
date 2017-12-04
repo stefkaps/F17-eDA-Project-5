@@ -338,7 +338,7 @@ renderPlot({
 As mentioned in the overview above, this random forest analysis yields similar results in terms of r-squared as both the above linear regression models. In fact, its r-squared value lies right in the middle.
 
 ## YLL_abs
-Interesting finding: The predictors chosen in both boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. Interestingly, best subset selection, and backwards and forwards stepwise selection show the best models around 2-3 predictors, and then get continually worse from there. We have never seen this particular distribution before, and so we looked at our analyses for quite a while. We believe this may just be a consequence of the data (possibly due to correlated values). 
+Interesting finding: The predictors chosen in both the boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. This linear regression model was a much better fit than just using the predictors chosen from boosting. Also, the linear regression model using just the predictors from the lasso analysis seemed to overfit. Interestingly, best subset selection showed the best model is around 12 predictors, foreward selection showed the best model is around 8 predictors, and backwards selection showed the best model is around 4 predictors. It was interesting these selections chose models with such different numbers of predictors.
 
 ### Boosting Model
 
@@ -352,6 +352,22 @@ summary(boost.dfb, plotit=FALSE)
 ```
 
 It makes sense that the number of death predictors are the best predictors for years of life lost since people with diseases are more likely to have years of their lives lost due to dying from the disease. 
+
+### Model 1 Linear Regression with Boosting Predictors
+
+```{r}
+# LR with top 7 Boosting Predictors
+df_yll_abs_lr=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit)
+df_yll_abs_lr=dplyr::sample_n(df_yll_abs_lr, 10000)
+#attach(df_yll_abs)
+#df_nona_yll = na.omit(df_yll_abs)
+#attach(df_nona_yll)
+fitYLLAbs = lm(yll_abs~death_abs_ui_upto + daly_abs_ui_from + death_abs + death_abs_ui_from + daly_abs + daly_abs_ui_upto + death_pct_ui_from,data=df_yll_abs_lr)
+fitYLLAbs
+summary(fitYLLAbs)
+```
+
+In this linear regression model, we used the top 7 predictors from the boosting analysis to predit yll_abs. The small p-value shows that these are good predictors for yll_abs. Also, the r-squared was fairly high.
 
 
 ### Lasso
@@ -374,8 +390,7 @@ cv.lasso1=cv.glmnet(xl,yl,family="gaussian")
 coef(cv.lasso1)
 ```
 
-Interestingly, death_abs_ui_from and death_abs were not included, yet they were among the top predictors in boosting analysis. Also, death_abs_ui_upto, daly_abs, daly_abs_ui_upto, and daly_abs_ui_from were chosen in the top 6 predictors for boosting, and they were predictors that lasso did not reduce to zero. This is further evidence that these four predictors are probably the best for predicting yll_abs. 
-
+Interestingly, death_abs_ui_from and death_abs were not included, yet they were among the top predictors in boosting analysis. Also, death_abs_ui_upto, daly_abs, and daly_abs_ui_from were chosen in the top 7 predictors for boosting, and they were predictors that lasso did not reduce to zero. This is further evidence that these three predictors are probably the best for predicting yll_abs.  
 
 ```{r}
 # plot how lambda is changing against the model fit
@@ -384,22 +399,36 @@ renderPlot(plot(fit.lasso1,xvar="lambda",label=TRUE))
 renderPlot(plot(cv.lasso1))
 ```
 
-### Linear Regression
-
-[Linear Regression on yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/8593766c-f3de-4a3d-a054-a91dc9130785)
-
+### Model 2 Linear Regression with Lasso Predictors
 ```{r}
 df_yll_abs_lr=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit)
 df_yll_abs_lr=dplyr::sample_n(df_yll_abs_lr, 10000)
 #attach(df_yll_abs)
 #df_nona_yll = na.omit(df_yll_abs)
 #attach(df_nona_yll)
-fitYLLAbs = lm(yll_abs~death_abs_ui_upto + daly_abs + daly_abs_ui_upto + daly_abs_ui_from,data=df_yll_abs_lr)
+fitYLLAbs = lm(yll_abs~death_abs_ui_upto + death_pct + yld_abs + yld_abs_ui_from + yld_abs_ui_upto + daly_abs + daly_abs_ui_from,data=df_yll_abs_lr)
+fitYLLAbs
+summary(fitYLLAbs)
+```
+This model is too perfect, since the adjusted r-squared is 1. We believe that this is due to overfitting. Due to this, we made another linear regression model that only used the predictors that were included in both the boosting and lasso anlyses. This model can be seen in the next section.
+
+### Model 3 Linear Regression with Boosting & Lasso Predictors
+
+[Linear Regression on yll_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/8593766c-f3de-4a3d-a054-a91dc9130785)
+
+```{r}
+# LR with Predictors that were in both Lasso & Boosting
+df_yll_abs_lr=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit)
+df_yll_abs_lr=dplyr::sample_n(df_yll_abs_lr, 10000)
+#attach(df_yll_abs)
+#df_nona_yll = na.omit(df_yll_abs)
+#attach(df_nona_yll)
+fitYLLAbs = lm(yll_abs~death_abs_ui_upto + daly_abs + daly_abs_ui_from,data=df_yll_abs_lr)
 fitYLLAbs
 summary(fitYLLAbs)
 ```
 
-The small p values are more evidence that death_abs_ui_upto, daly_abs, daly_abs_ui_upto, and daly_abs_ui_from are good predictors of yll_abs.
+In this model, we used the predictors death_abs_ui_upto, daly_abs, and daly_abs_ui_from. We chose these predictors since they were the ones that were included in both the lasso and boosting anlyses. The small p-values are more evidence that these three predictors are good at predicting yll_abs. Also, the r-squared was fairly high, and higher than that of the first model. This model was much better than the previous one too, where we used only the top 7 predictors from the boosting analysis. 
 
 
 ### Best Subset Selection

@@ -109,7 +109,7 @@ summary(fit_yld_abs)
 ### Best Subset Selection
 
 #Best Subset Selection for yll_abs
-df2=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from, -yll_abs)
+df2=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
 df2=dplyr::sample_n(df2, 10000)
 
 attach(df2)
@@ -129,11 +129,26 @@ plot(regfit.full,scale="Cp")
 plot(regfit.full,scale="adjr2")
 coef(regfit.full,10)
 
+#best subset for yld_abs
+regfit.full=regsubsets(yld_abs~.,data=dfb2_nona, nvmax=37)
+reg.summary=summary(regfit.full)
+names(reg.summary)
+plot(reg.summary$cp,xlab="Number of Variables",ylab="Cp")
+which.min(reg.summary$cp)
+
+plot(reg.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
+which.max(reg.summary$adjr2)
+
+summary(regfit.full)
+
+plot(regfit.full,scale="Cp")
+plot(regfit.full,scale="adjr2")
+coef(regfit.full,10)
 
 
 ###Forwards and Backwards Selection Section
 
-#Forward#
+#Forward yll_abs#
 regfit.fwd=regsubsets(yll_abs~.,data=df2,nvmax=37,method="forward")
 summary(regfit.fwd)
 
@@ -148,7 +163,7 @@ which.max(regfwd.summary$adjr2)
 plot(regfwd.summary$cp,xlab="Number of Variables",ylab="Cp")
 plot(regfwd.summary$adjr2,xlab="Number of Variables",ylab="adjr2")
 
-#Backward#
+#Backward yll_abs#
 regfit.bwd=regsubsets(yll_abs~.,data=df2,nvmax=37,method="backward")
 summary(regfit.bwd)
 
@@ -170,7 +185,6 @@ df3=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -s
 df3=dplyr::sample_n(df3, 10000)
 
 df3_nona = na.omit(df3)
-
 attach(df3_nona)
 
 set.seed(101)
@@ -192,33 +206,22 @@ for(mtry in 1:37){
 matplot(1:mtry,cbind(test.err,oob.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
 legend("topright",legend=c("OOB","Test"),pch=19,col=c("red","blue"))
 
+# Random Forest for yld_abs
+set.seed(101)
+dim(dfb2_nona)
+train=sample(1:nrow(dfb2_nona),4457)
 
+rf.yll_abs=randomForest(yld_abs~.,data=dfb2_nona,subset=train)
+rf.yll_abs
 
-### 
-
-project <- "https://data.world/kellyjennings/disease"
-df10c <- data.world::query(
-  data.world::qry_sql("SELECT * FROM disease2010cancer"),
-  dataset = project
-)
-
-attach(df10c)
-df10c = df10c %>% dplyr::select(.,-cause_medium,-cause_short,-region_name,-year,-age_name_unit) %>% dplyr::mutate(sex_name = as.factor(sex_name))
-df10c_nona = na.omit(df10c)
-
-View(df10c)
-
-# for this you have to pass in a matrix of x. You have to construct the x's
-x=model.matrix(cause_name~.-1,data=df10c_nona) 
-# and construct the y's
-y=df10c_nona$cause_name
-
-fit.lasso=glmnet(x,y,family="multinomial")
-# plot how lambda is changing against the model fit
-plot(fit.lasso,xvar="lambda",label=TRUE) # the one that disappears last is our best predictor
-# do cross validation for each lambda (default is kfold of 10 across 100 lambdas)
-cv.lasso=cv.glmnet(x,y,family="multinomial")
-# plot the cross validation mean squared errors of all 100 models
-plot(cv.lasso)
-# get the coefficients for what it thinks is the best model
-coef(cv.lasso)
+oob.err=double(37)
+test.err=double(37)
+for(mtry in 1:37){
+  fit=randomForest(yld_abs~.,data=dfb2_nona,subset=train,mtry=mtry,ntree=400)
+  oob.err[mtry]=fit$mse[400]
+  pred=predict(fit,dfb2_nona[-train,])
+  test.err[mtry]=with(dfb2_nona[-train,],mean((yld_abs-pred)^2))
+  cat(mtry," ")
+}
+matplot(1:mtry,cbind(test.err,oob.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
+legend("topright",legend=c("OOB","Test"),pch=19,col=c("red","blue"))
