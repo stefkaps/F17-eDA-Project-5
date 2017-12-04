@@ -64,7 +64,106 @@ df_allyears <- df %>% dplyr::mutate(., age_name_from2 = ifelse(age_name_unit == 
 ```
 
 ## **Introduction** 
-In our final project, we decided to examine a fairly large dataset regarding the global burden of disease. This dataset, provided by a study done by the Institute for Health Metrics and Evaluation, inluded information on number of deaths, death percent, death rate, years of life lost, years of life lived with a disability, life years adjusted for disability, and the causes of these measures. Throughout our analyses of these data, we generally focused on Europe  (Western and Eastern Europe), rather than the whole dataset. However, we looked at a variety of subsets of the data, including specific years, specific disease types, etc. There was a lot to be learned here, but the areas we gave particular attention to were: 
+In our final project, we decided to examine a fairly large dataset regarding the global burden of disease. This dataset, provided by a study done by the Institute for Health Metrics and Evaluation, inluded information on number of deaths, death percent, death rate, years of life lost, years of life lived with a disability, life years adjusted for disability, and the causes of these measures. 
+
+Description from data source:
+
+"Statistics measured by the Global Burden of Disease (GBD) Study compiled by the Institute for Health Metrics and Evaluation (IHME). This study estimates the burden of diseases, injuries, and risk factors for the global population and specific regions and is a collaboration between the IHME and the University of Queensland, Harvard School of Public Health, Johns Hopkins Bloomberg School of Public Health, University of Tokyo, Imperial College London and the WHO."
+
+Schema from data source:
+
+"Cause Full Name Full Name of the Cause
+
+Cause (Medium) Moderately Shortened Name of the Cause
+
+Cause (Short) Fully Shortened Name of the Cause
+
+Region Name Region name; the full list of regions are as shown : Global; High-income Asia Pacific; Western Europe; Australasia; High-income North America; Central Europe; Southern Latin America; Eastern Europe; East Asia; Tropical Latin America; Central Latin America; Southeast Asia; Central Asia; Andean latin America; North Africa and Middle East; Caribbean; South Asia; Oceania; Southern sub-Saharan Africa; Eastern sub-Saharan Africa; Central sub-Saharan Africa; Western sub-Saharan Africa
+
+Year Year : 1990; 2005; 2010
+
+Age Min. Minimum age for this age group; the full list of age groups are as shown : 0-6 days; 7-27 days; 28-364 days; 1-4 years; 5-9 years; 10-14 years; 15-19 years; 20-24 years; 25-29 years; 30-34 years; 35-39 years; 40-44 years; 50-54 years; 55-59 years; 60-64 years; 65-69 years; 70-74 years; 75-79 years; 80+ years; All ages
+
+Age Max. Maximum age for this age group; the full list of age groups are as shown : 0-6 days; 7-27 days; 28-364 days; 1-4 years; 5-9 years; 10-14 years; 15-19 years; 20-24 years; 25-29 years; 30-34 years; 35-39 years; 40-44 years; 50-54 years; 55-59 years; 60-64 years; 65-69 years; 70-74 years; 75-79 years; 80+ years; All ages
+
+Age Unit Age group units; the full list of age groups are as shown : 0-6 days; 7-27 days; 28-364 days; 1-4 years; 5-9 years; 10-14 years; 15-19 years; 20-24 years; 25-29 years; 30-34 years; 35-39 years; 40-44 years; 50-54 years; 55-59 years; 60-64 years; 65-69 years; 70-74 years; 75-79 years; 80+ years; All ages
+
+Sex Sex : Male; Female; Both
+
+No. of Deaths Number of Deaths
+
+No. of Deaths (UI Min.) DNumber of Deaths - 95% Uncertainty Interval Minimum Value
+
+No. of Deaths (UI Max.) DNumber of Deaths - 95% Uncertainty Interval Maximum Value
+
+Death Pct. Death Percent of All Causes
+
+Death Pct. (UI Min.) Death Percent of All Causes - 95% Uncertainty Interval Minimum Value
+
+Death Pct. (UI Max.) Death Percent of All Causes - 95% Uncertainty Interval Maximum Value
+
+Death Rate Death Rate Per 100,000
+
+Death Rate (UI Min.) Death Rate Per 100,000 - 95% Uncertainty Interval Minimum Value
+
+Death Rate (UI Max.) Death Rate Per 100,000 - 95% Uncertainty Interval Maximum Value
+
+No. of YLL Number of Years of Life Lost (YLL)
+
+No. of YLL (UI Min.) Number of Years of Life Lost (YLL) - 95% Uncertainty Interval Minimum Value
+
+No. of YLL (UI Max.) Number of Years of Life Lost (YLL) - 95% Uncertainty Interval Maximum Value
+
+YLL Pct. Years of Life Lost (YLL) Percent of All Causes
+
+YLL Pct. (UI Min.) Years of Life Lost (YLL) Percent of All Causes - 95% Uncertainty Interval Minimum Value
+
+YLL Pct. (UI Max.) Years of Life Lost (YLL) Percent of All Causes - 95% Uncertainty Interval Maximum Value
+
+YLL Rate Years of Life Lost (YLL) Rate Per 100,000
+
+YLL Rate (UI Min.) Years of Life Lost (YLL) Rate Per 100,000 - 95% Uncertainty Interval Minimum Value
+
+YLL Rate (UI Max.) Years of Life Lost (YLL) Rate Per 100,000 - 95% Uncertainty Interval Maximum Value
+
+No. of YLD Number of Years Lived with Disability (YLD)
+
+No. of YLD (UI Min.) Number of Years Lived with Disability (YLD) - 95% Uncertainty Interval Minimum Value
+
+No. of YLD (UI Max.) Number of Years Lived with Disability (YLD) - 95% Uncertainty Interval Maximum Value
+
+YLD Pct. Years Lived with Disability (YLD) Percent of All Causes
+
+YLD Pct. (UI Min.) Years Lived with Disability (YLD) Percent of All Causes - 95% Uncertainty Interval Minimum Value
+
+YLD Pct. (UI Max.) Years Lived with Disability (YLD) Percent of All Causes - 95% Uncertainty Interval Maximum Value
+
+YLD Rate Years Lived with Disability (YLD) Rate Per 100,000
+
+YLD Rate (UI Min.) Years Lived with Disability (YLD) Rate Per 100,000 - 95% Uncertainty Interval Minimum Value
+
+YLD Rate (UI Max.) Years Lived with Disability (YLD) Rate Per 100,000 - 95% Uncertainty Interval Miaximum Value
+
+No. of DALY Number of Disability Adjusted Life Years (DALY)
+
+No. of DALY (UI Min.) Number of Disability Adjusted Life Years (DALY) - 95% Uncertainty Interval Minimum Value
+
+No. of DALY (UI Max.) Number of Disability Adjusted Life Years (DALY) - 95% Uncertainty Interval Maximum Value
+
+DALY Pct. Disability Adjusted Life Years (DALY) Percent of All Causes
+
+DALY Pct. (UI Min.) Disability Adjusted Life Years (DALY) Percent of All Causes - 95% Uncertainty Interval Minimum Value
+
+DALY Pct. (UI Max.) Disability Adjusted Life Years (DALY) Percent of All Causes - 95% Uncertainty Interval Maximum Value
+
+DALY Rate Years Lived with Disability (YLD) Rate Per 100,000
+
+DALY Rate (UI Min.) Years Lived with Disability (YLD) Rate Per 100,000 - 95% Uncertainty Interval Minimum Value
+
+DALY Rate (UI Max.) Years Lived with Disability (YLD) Rate Per 100,000 - 95% Uncertainty Interval Maximum Value" 
+This description is taken from the original source: [Institute for Health Metrics and Evaluation - Global Burden of Disease.]http://www.healthmetricsandevaluation.org/ghdx/record/global-burden-disease-study-2010-gbd-2010-results-cause-1990-2010
+
+Throughout our analyses of these data, we generally focused on Europe  (Western and Eastern Europe), rather than the whole dataset. However, we looked at a variety of subsets of the data, including specific years, specific disease types, etc. There was a lot to be learned here, but the areas we gave particular attention to were: 
 
 ## Death_abs
 Interesting finding: The model based on boosting predictors did somewhat better in terms of adjusted r-squared than a model based on predictors found in both lasso and boosting analyses. The differences are very small, and, in fact, we see that the standard error for the two predictors used in the second model may be smaller than the standard error for the same predictors in the previous model. However, when we only look at r-squared values, we see the following order in terms of performance- Model 1 (yll_abs_ui_from, yll_abs, yll_abs_ui_upto), Random Forest, Model 2 (yll_abs_ui_from, yll_abs).
@@ -377,7 +476,7 @@ A larger sample and bagging were used in the insight. These results yielded an e
 
 
 ## Eastern vs Western Europe
-Interesting finding: Boosting did significantly better than LR, LDA, QDA, or even KNN. K means clustering helps visualize why this might be the case.
+From the many regions originally available in the global database, we chose to focus on Eastern and Western Europe. First, we used boosting to find the best predictors for the model. We then looked at Logistic Regression, LDA, QDA, and KNN models to see if the best predictors from boosting would do well in these model types.
 
 ### Boosting Model
 
@@ -395,7 +494,6 @@ summary(boost.europe, plotit=FALSE)
 
 n.trees=seq(from=100,to=500,by=50)
 predmat_region=predict(boost.europe,newdata=df_test_region[test_region,],n.trees=n.trees)
-dim(predmat_region)
 # boosting error
 berr_region=with(df_test_region[test_region,],apply( (predmat_region-region_binary)^2,2,mean))
 ```
@@ -407,10 +505,10 @@ renderPlot({
 })
 ```
 
-We ran 500 trees in this model (for a reasonable loading time), and the prediction error is a lot better than using LR, LDA, or QDA. While those had an accuracy from 51-65%, this model has an error rate that almost gets down to 0.18, corresponding to a prediction accuracy of 82%.
+We ran 500 trees in this model (for a reasonable loading time), and the prediction error is a lot better than using LR, LDA, or QDA. While those had an accuracy from 51-65%, this model has an error rate that almost gets down to 0.18, corresponding to a prediction accuracy of 82%. The top predictors chosen for this model were yll_rate_ui_upto, daly_rate_ui_upto, daly_abs_ui_from, yld_abs_ui_from, yld_rate_ui_upto.
 
 ### Logistic Regression
-
+Next, we took the top five predictors from boosting and made a logistic regression model.
 ```{r}
 # Logistic Regression
 df_region_na = na.omit(df_region)
@@ -425,20 +523,21 @@ region.test = df_test_region_na[test_region_na,]$region_binary
 table(glm.pred,region.test)
 mean(glm.pred==region.test)
 ```
-
+The prediction accuracy for LR was 64%, which is significantly worse than the boosting accuracy.
 
 ### LDA
 
 ```{r}
-# LDA
-
 lda.fit.region=lda(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_from+daly_abs_ui_from+yld_rate_ui_upto,data=df_region,subset=train_region)
 lda.fit.region
 lda.pred=predict(lda.fit.region, df_test_region[test_region,])
 lda_df = data.frame(lda.pred)
-table(lda.pred$class,df_test_region[test_region,]$region_binary) #confusion matrix
-mean(lda.pred$class==df_test_region[test_region,]$region_binary) #bad mean
+table(lda.pred$class,df_test_region[test_region,]$region_binary)
+mean(lda.pred$class==df_test_region[test_region,]$region_binary)
+```
+The prediction accuracy for this model was 54%, which is essentially no better than flipping a coin.
 
+```{r}
 predroc2 <- prediction(lda_df$posterior.1,df_test_region[test_region,]$region_binary)
 roc.perf = performance(predroc2, measure = "tpr", x.measure = "fpr")
 
@@ -457,8 +556,6 @@ renderPlot({
 ### QDA
 
 ```{r}
-# QDA
-
 qda.fit.region=qda(region_binary~yll_rate_ui_upto+daly_rate_ui_upto+yld_abs_ui_from+daly_abs_ui_from+yld_rate_ui_upto,data=df_region,subset=train_region)
 
 qda.fit.region
@@ -466,7 +563,10 @@ qda.pred = predict(qda.fit.region, df_test_region[test_region,])
 qda_df=data.frame(qda.pred)
 table(qda.pred$class,df_test_region[test_region,]$region_binary)
 mean(qda.pred$class==df_test_region[test_region,]$region_binary)
+```
+The prediction accuracy for this was even worse than LDA at 51.5%.
 
+```{r}
 predroc3 <- prediction(qda_df$posterior.1,df_test_region[test_region,]$region_binary)
 roc.perf2 = performance(predroc3, measure = "tpr", x.measure = "fpr")
 auc2 = performance(predroc3, measure = "auc")
@@ -493,7 +593,10 @@ knn.pred=class::knn(predictorsKNN[train_region,],predictorsKNN[test_region,],reg
 table(knn.pred,region_binary[test_region])
 mean(knn.pred==region_binary[test_region])
 ```
+KNN did about as well as LR with a prediction accuracy of 68%.
+
 ### K Means Clustering
+In order to gain insight as to why boosting may have done so much better than than the other model types, we did K means clustering using two clusters and the top two predictors from boosting.
 ```{r}
 ## K means
 km_region_x = df_region%>% dplyr::select(yll_rate_ui_upto,daly_rate_ui_upto)
@@ -505,7 +608,7 @@ km.out1=kmeans(km_region_x,2)
 renderPlot(plot(km_region_x,col=km.out1$cluster,cex=2,main = "K means clustering", pch=1,lwd=2))
 renderPlot(plot(km_region_x,col=as.factor(df_region$region_binary),cex=2,main = "Actual",pch=1,lwd=2))
 ```
-
+The clustering compared to the real region classification shows that K means is unable to disctinguish between the regions in the lower left part of the graph due to extreme overlap. However, the upper right is dominated by one class. Perhaps the simpler model types are unable to distinguish between the classes due to overlap. However, the slow learning quality of boosting may allow it to find the nuanced differences between the classes. 
 
 ## Support Vector Machine: Multiple Sclerosis for Male vs Females
 We used support vector machines to classify the Yld Rate vs Death Rate plot for Multiple Sclerosis in Europe by male and female points.
