@@ -15,7 +15,6 @@ runtime: shiny
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(modelr)
-require(dplyr)
 require(MASS)
 require(ROCR)
 require(ISLR)
@@ -26,6 +25,7 @@ require(tree)
 require(randomForest)
 require(gbm)
 require(e1071)
+require(dplyr)
 require(shiny)
 require(data.world)
 knitr::opts_chunk$set(echo = TRUE)
@@ -55,7 +55,7 @@ df <- data.world::query(
 
 ## Setup
 We created several dataframes for our analyses. 
-The first thing we did was convert the age to all be in units of years (since some measurements in the dataset were in days). We no longer needed the column age_name_unit after standardizing the age units.
+The first thing we did was convert the ages to all be in units of years (since some measurements in the dataset were in days). We no longer needed the column age_name_unit after standardizing the age units.
 In addition, there were some variables that we excluded from all our analyses because they were not meaningful as predictors. These included cause_medium and cause_short, which were just different versions of the full cause name.
 
 ```{r}
@@ -64,13 +64,13 @@ df_allyears <- df %>% dplyr::mutate(., age_name_from2 = ifelse(age_name_unit == 
 ```
 
 ## **Introduction** 
-In our final project, we decided to examine a fairly large dataset regarding the global burden of disease. This dataset, provided by a study done by the Insitute for Health Metrics and Evaluation, inluded information on number of deaths, death percent, death rate, years of life lost, years of life lived with a disability, life years adjusted for diability, and the causes of these measures. Throughout our analyses of these data, we generally focused on Europe, rather than the whole dataset (Western and Eastern Europe). However, we looked at a variety of subsets of the data, inlcuding specific years, specific disease types, etc. There was a lot to be learned here, but the areas we gave particular attention to were: 
+In our final project, we decided to examine a fairly large dataset regarding the global burden of disease. This dataset, provided by a study done by the Institute for Health Metrics and Evaluation, inluded information on number of deaths, death percent, death rate, years of life lost, years of life lived with a disability, life years adjusted for disability, and the causes of these measures. Throughout our analyses of these data, we generally focused on Europe  (Western and Eastern Europe), rather than the whole dataset. However, we looked at a variety of subsets of the data, inlcuding specific years, specific disease types, etc. There was a lot to be learned here, but the areas we gave particular attention to were: 
 
 ## Death_abs
 Interesting finding: The model based on boosting predictors did somewhat better in terms of adjusted r-squared than a model based on predictors found in both lasso and boosting analyses. The differences are very small, and, in fact, we see that the standard error for the two predictors used in the second model may be smaller than the standard error for the same predictors in the previous model. However, when we only look at r-squared values, we see the following order in terms of performance- Model 1 (yll_abs_ui_from, yll_abs, yll_abs_ui_upto), Random Forest, Model 2 (yll_abs_ui_from, yll_abs).
 
-
--Boosting (for this analysis, we excluded categorical variables for ease of computation. We also excluded death_abs_ui_upto and death_abs_ui_from because these are different aspects of the death_abs measurement itself and are therefore not valid predictors of death_abs)
+### Boosting Model
+For this analysis, we excluded categorical variables for ease of computation. We also excluded death_abs_ui_upto and death_abs_ui_from because these are different aspects of the death_abs measurement itself and are therefore not valid predictors of death_abs.
 
 ```{r}
 df_deathabs=dplyr::select(df_allyears, -cause_name, -region_name, -sex_name, -death_abs_ui_upto, -death_abs_ui_from)
@@ -97,11 +97,11 @@ This selected yll_abs_ui_from, yll_abs, death_pct_ui_from, daly_abs, and yll_abs
 # })
 ```
 
--Subsequent linear regression
-?????????????????????????????
+### Subsequent Linear Regression
+!!!This insight- https://data.world/tarrantrl/f-17-eda-project-5/insights/2c1db0df-9dae-4b4c-a816-d862f903a179
+The code is the same as the LR model below, just with the third predictor.!!!
 
--Backwards/forwards/
--best subset? (No analysis on predictors gleaned from this. Maybe don't include?)
+### Backwards/Forwards Stepwise Selection
 
 ```{r}
 df_deathabs_bs=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
@@ -139,7 +139,9 @@ renderPlot(plot(regbwd.summary$cp,xlab="Number of Variables",ylab="Cp"))
 renderPlot(plot(regbwd.summary$adjr2,xlab="Number of Variables",ylab="adjr2"))
 ```
 
--Lasso on death abs
+As you can see, in the above plots for forward and backward stepwise selection, they produced relatively similar results, suggesting the best model lies between 27-29 predictors.
+
+### Lasso on death_abs
 
 ```{r}
 df_deathabs_lasso=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
@@ -158,7 +160,11 @@ renderPlot(plot(fit.lasso,xvar="lambda",label=TRUE))
 renderPlot(plot(cv.lasso))
 ```
 
--Subsequent updated linear regression (fared worse in terms of adjr2. Intercept doubles practically. std. error actually goes down a lot for predictors though- I previously missed/misinterpreted this. I can make a comment on the post if need be. Or we can just mention it here. Take a look to confirm please. Either way it won't affect insight numbers.)
+This yielded similar results to the original boosting model, but ultimately excluded one variable boosting did not. From this, we ended up running the linear regression model below, with the two best predictors both Lasso and Boosting chose.
+
+
+### Model 2 Linear Regression
+!!!(fared worse in terms of adjr2. Intercept doubles practically. std. error actually goes down a lot for predictors though- I previously missed/misinterpreted this. I can make a comment on the post if need be. Or we can just mention it here. Take a look to confirm please. Either way it won't affect insight numbers.)!!!
 
 ```{r}
 df_deathabs_lr=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -death_abs_ui_upto, -death_abs_ui_from)
@@ -174,7 +180,7 @@ fitDeathAbs
 summary(fitDeathAbs)
 ```
 
--Random forest on death_abs (similar r2, sits between original LR and updated LR)
+### Random Forest on death_abs
 
 The random forest code takes a long time to run, so this is just a sample. See the more accurate results in this insight [here]https://data.world/tarrantrl/f-17-eda-project-5/insights/230157c7-8aed-4067-b57f-6b8bf34ab6f6
 
@@ -208,11 +214,12 @@ renderPlot({
 })
 ```
 
+As mentioned in the overview above, this random forest analysis yields similar results in terms of r-squared as both the above linear regression models. In fact, it's r-squared value lies right in the middle.
 
 ## YLL_abs
-Interesting finding: The predictors chosen in both boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. Interstingly, best subset selection, and backwards and forwards stepwise selection show the best models around 2-3 predictors, and then get continually worse from there. We have never seen this particular distribution before, and looked out our analyses for quite a while. We believe this may just be a consequence of the data (possibly due to correlated values). 
+Interesting finding: The predictors chosen in both boosting and lasso analyses fared well in linear regression, having a significant p-value for the model and a very high r-squared value. Interstingly, best subset selection, and backwards and forwards stepwise selection show the best models around 2-3 predictors, and then get continually worse from there. We have never seen this particular distribution before, and so we looked at our analyses for quite a while. We believe this may just be a consequence of the data (possibly due to correlated values). 
 
--Boosting
+### Boosting Model
 
 ```{r}
 df_yll_abs_b=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
@@ -224,7 +231,7 @@ summary(boost.dfb)
 It makes sense that the number of death predictors are the best predictors for years of life lost since people with diseases are more likely to have years of their lives lost due to dying from the disease. 
 
 
--Lasso
+### Lasso
 
 ```{r}
 df_yll_abs_l=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
@@ -252,7 +259,7 @@ renderPlot(plot(fit.lasso1,xvar="lambda",label=TRUE))
 renderPlot(plot(cv.lasso1))
 ```
 
--Linear regression
+### Linear regression
 
 ```{r}
 df_yll_abs_lr=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit)
@@ -268,8 +275,8 @@ summary(fitYLLAbs)
 The small p values are more evidence that death_abs_ui_upto, daly_abs, daly_abs_ui_upto, and daly_abs_ui_from are good predictors of yll_abs.
 
 
--Best subset selection
-takes a while!!!!!!!!!!!
+### Best Subset Selection
+!!!takes a while!!!!!!!!!!!
 ```{r}
 df_yll_abs_sub=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
 df_yll_abs_sub=dplyr::sample_n(df_yll_abs_sub, 5000)
@@ -290,7 +297,7 @@ renderPlot(plot(regfit.full,scale="Cp"))
 renderPlot(plot(regfit.full,scale="adjr2"))
 ```
 
--Forwards/backwards
+### Forwards/Backwards Stepwise Selection
 
 ```{r}
 regfit.fwd1=regsubsets(yll_abs~.,data=df_yll_abs_sub,nvmax=37,method="forward")
@@ -323,9 +330,9 @@ renderPlot(plot(regbwd.summary1$cp,xlab="Number of Variables",ylab="Cp"))
 renderPlot(plot(regbwd.summary1$adjr2,xlab="Number of Variables",ylab="adjr2"))
 ```
 
--Random forest
+### Random Forest
 
-The random forest code takes a long time to run, so this is just a sample. See the more accurate results in this insight [here]https://data.world/tarrantrl/f-17-eda-project-5/insights/e55cacf1-7100-42da-90bf-6bc2df4a3a0a
+The random forest code takes a long time to run, so this is just a sample. See the more accurate results in this insight [here.]https://data.world/tarrantrl/f-17-eda-project-5/insights/e55cacf1-7100-42da-90bf-6bc2df4a3a0a
 
 ```{r}
 df_yll_abs_rf=dplyr::select(df, -cause_name, -cause_medium, -cause_short, -region_name, -sex_name, -age_name_unit, -yll_abs_ui_upto, -yll_abs_ui_from)
@@ -355,13 +362,13 @@ renderPlot({
 })
 ```
 
-A larger sample and bagging were used in the insight. These results yielded an excellent r-squared value (% variance explained) at %96.05. 
+A larger sample and bagging were used in the insight. These results yielded an excellent r-squared value (% variance explained) at 96.05%. 
 
 
 ## Eastern vs Western Europe
 Interesting finding: Boosting did significantly better than LR, LDA, QDA, or even KNN. K means clustering helps visualize why this might be the case.
 
-- Boosting model
+### Boosting Model
 
 ```{r}
 df_region = df_allyears %>% dplyr::select(.,-cause_name,-year,-age_name_from, -age_name_upto, -sex_name) %>% dplyr::mutate(region_binary = ifelse(region_name == "Eastern Europe", 1, 0)) %>% dplyr::select(.,-region_name)
@@ -391,7 +398,7 @@ renderPlot({
 
 We ran 500 trees in this model (for a reasonable loading time), and the prediction error is a lot better than using LR, LDA, or QDA. While those had an accuracy from 51-58%, this model has an error rate that almost gets down to 0.18, corresponding to a prediction accuracy of 82%.
 
-- Logistic Regression
+### Logistic Regression
 
 ```{r}
 # Logistic Regression
@@ -409,7 +416,7 @@ mean(glm.pred==region.test)
 ```
 
 
-- LDA
+### LDA
 
 ```{r}
 # LDA
@@ -434,7 +441,7 @@ auc1@y.values
 ```
 
 
-- QDA
+### QDA
 
 ```{r}
 # QDA
@@ -456,7 +463,7 @@ auc2@y.values
 ```
 
 
-- KNN
+### KNN
 
 ```{r}
 # KNN
@@ -468,7 +475,7 @@ knn.pred=class::knn(predictorsKNN[train_region,],predictorsKNN[test_region,],reg
 table(knn.pred,region_binary[test_region])
 mean(knn.pred==region_binary[test_region])
 ```
-- kmeans
+### K Means Clustering
 ```{r}
 ## K means
 km_region_x = df_region%>% dplyr::select(yll_rate_ui_upto,daly_rate_ui_upto)
@@ -481,8 +488,8 @@ plot(km_region_x,col=as.factor(df_region$region_name),cex=2,main = "Actual",pch=
 
 ## Cause
 Because there were so many classes for cause, we did some analysis where we looked at subsets of the causes. This included looking at cancer and heart disease.
-- Best subset selection
--KNN
+### Best subset selection
+### KNN
 
 ## Support Vector Machine: Multiple Sclerosis for Male vs Females
 We used support vector machines to classify the Yld Rate vs Death Rate plot for Multiple Sclerosis in Europe by male and female points.
@@ -541,7 +548,7 @@ Women with multiple sclerosis tend to have a higher death rate and higher rate o
 
 ## Unsupervised Learning
 
-Interesting finding: After looking at a scatterplot of yld_rate vs yll_rate for only data regarding Ischemic heart disease and stroke in Europe, we noticed a natural and clear separation between Western and Eastern Europe. Interestingly, K-means clustering didn't separate the data as we would have expected it to, which was possibly due to one of the centroids used by the analysis being focused in a highly clustered area (data points from both regious were very close together). Data around the other centroid had points that were mostly belonging to Eastern Europe, which was mostly correct. Had our data been a bit more spread out, K-means clustering may have done a better job. 
+Interesting finding: After looking at a scatterplot of yld_rate vs yll_rate for only data regarding Ischemic heart disease and stroke in Europe, we noticed a natural and clear separation between Western and Eastern Europe. Interestingly, K-means clustering didn't separate the data as we would have expected it to, which was possibly due to one of the centroids used by the analysis being focused in a highly clustered area (data points from both regions were very close together). Data around the other centroid had points that were mostly belonging to Eastern Europe, which was mostly correct. Had our data been a bit more spread out, K-means clustering may have done a better job. 
 
 ```{r}
 dfe_heart = df %>% dplyr::filter(region_name %in% c("Eastern Europe", "Western Europe") & cause_name %in% c("Ischemic heart disease", "Ischemic stroke") & age_name_unit == "years")
@@ -570,7 +577,7 @@ renderPlot(plot(x_km,col=hc.cut2,cex=2,main = "Hierarchical: Single", pch=1,lwd=
 renderPlot(plot(x_km,col=hc.cut3,cex=2,main = "Hierarchical: Average", pch=1,lwd=2))
 ```
 
--PCA on subset of data
+### PCA on subset of data
 
 ```{r}
 df_subset2 <- df %>% dplyr::select(., -cause_name, -cause_medium, -cause_short, -region_name, -year, -age_name_unit, -sex_name)
@@ -587,7 +594,7 @@ names(pca.out)
 To see the graph:
 [PCA on Subset of the Data]https://data.world/tarrantrl/f-17-eda-project-5/insights/03e1d5df-1b45-4ba9-a218-ceef43276330
 
-Interesting finding: The predictors displayed in the biplot of this analysis were clustered by type (death rate predictors grouped together, years of life lost predictors grouped together, etc.). This makes sense, considering they are usually pretty standard variations of each other. (Need to further interpret this biplot.)
+Interesting finding: The predictors displayed in the biplot of this analysis were clustered by type (death rate predictors grouped together, years of life lost predictors grouped together, etc.). This makes sense, considering they are usually pretty standard variations of each other. Most of the datapoints are clustered around the center here, with very few of them straying to the bottom right. This may be taken to mean that there isn't much variance in our data.
 
 
 ## Insights
