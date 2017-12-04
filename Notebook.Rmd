@@ -875,6 +875,6 @@ Interesting finding: The predictors displayed in the biplot of this analysis wer
 
 [Linear Regression on yld_abs with Lasso Predictors](https://data.world/tarrantrl/f-17-eda-project-5/insights/89615283-c198-4282-a4de-3b2308414449)
 
-
+[Residual Analysis with Death_abs](https://data.world/tarrantrl/f-17-eda-project-5/insights/4e1e3b1b-cd4a-4a3c-b462-610ace7657fe)
 
 
